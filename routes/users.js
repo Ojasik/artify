@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../database/User');
+require('dotenv').config();
 
 function authenticateJWT(req, res, next) {
   const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
@@ -11,7 +12,7 @@ function authenticateJWT(req, res, next) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
-  jwt.verify(token, '4RpjW8_llTO948gTaZQ0DkQ9T_Vn-Cz6suqDFLPu_sl1Dg', (err, user) => {
+  jwt.verify(token, process.env.JWT, (err, user) => {
     if (err) {
       return res.status(403).json({ message: 'Forbidden' });
     }
@@ -67,13 +68,9 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid username or password' });
     }
 
-    const token = jwt.sign(
-      { username: user.username, role: user.role },
-      '4RpjW8_llTO948gTaZQ0DkQ9T_Vn-Cz6suqDFLPu_sl1Dg',
-      {
-        expiresIn: '1h' // Token expires in 1 hour
-      }
-    );
+    const token = jwt.sign({ username: user.username, role: user.role }, process.env.JWT, {
+      expiresIn: '1h' // Token expires in 1 hour
+    });
 
     res.status(200).json({ message: 'Login successful', token });
   } catch (error) {
