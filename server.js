@@ -4,8 +4,9 @@ const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const usersRoute = require('./routes/users');
+require('dotenv').config();
 
-const password = encodeURIComponent('Nifertiti25');
+const password = encodeURIComponent(process.env.DB_PASSWORD);
 const uri = `mongodb+srv://ojasik:${password}@artify.ez4dwrl.mongodb.net/artify?retryWrites=true&w=majority`;
 
 const app = express();
