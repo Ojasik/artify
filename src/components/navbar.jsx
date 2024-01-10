@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/images/logo.png';
 import { Disclosure } from '@headlessui/react';
 import {
@@ -11,9 +11,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { Searchbar } from './searchbar';
 
-{
-  /*Array with categories buttons (TEST)*/
-}
+// Array with categories buttons (TEST)
 
 const categories = [
   { name: 'Painting', href: '#', current: true },
@@ -21,19 +19,27 @@ const categories = [
   { name: 'Literature', href: '#', current: false }
 ];
 
-{
-  /*Returns string of filtered classes (conditional rendering)*/
-}
+// Returns string of filtered classes (conditional rendering)
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
 export const Navbar = () => {
+  const navigate = useNavigate();
+  const token = localStorage.getItem('token');
+
+  const handleLogout = () => {
+    // Clear the token on logout
+    localStorage.removeItem('token');
+    navigate('/');
+  };
+
   return (
     <Disclosure>
       {({ open }) => (
-        <>
-          <div className="mx-auto font-semibold shadow-sm sm:shadow-none">
+        <div className="sticky top-0">
+          <div className="mx-auto bg-white font-semibold shadow-sm sm:shadow-none">
             <div className="mx-auto flex max-w-screen-2xl items-center justify-between p-2 sm:px-6 lg:px-8">
               <div className="flex items-center px-2 sm:hidden">
                 {/* Mobile menu button*/}
@@ -74,23 +80,38 @@ export const Navbar = () => {
                     <ShoppingCartIcon className="h-8 w-8" />
                   </button>
                 </div>
-                <div className="hidden space-x-4 sm:block">
-                  <Link to="/login">
-                    <button className="p-1 text-black hover:text-mainColor">
-                      <div>Log in</div>
+                {token ? (
+                  <div className="hidden space-x-4 sm:block">
+                    {/* If logged in, show profile and logout buttons */}
+                    <Link to="/profile">
+                      <button className="p-1 text-black hover:text-mainColor">Profile</button>
+                    </Link>
+                    <button
+                      className="rounded-3xl bg-mainColor px-4 py-2 text-white"
+                      onClick={handleLogout}>
+                      Logout
                     </button>
-                  </Link>
-                  <button className="rounded-3xl bg-mainColor px-4 py-2 text-white">
-                    <div>Sign up</div>
-                  </button>
-                </div>
+                  </div>
+                ) : (
+                  <div className="hidden space-x-4 sm:block">
+                    {/* If not logged in, show login and signup buttons */}
+                    <Link to="/login">
+                      <button className="p-1 text-black hover:text-mainColor">Log in</button>
+                    </Link>
+                    <Link to="/register">
+                      <button className="rounded-3xl bg-mainColor px-4 py-2 text-white">
+                        Sign up
+                      </button>
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
           </div>
           <hr />
 
           {/*SECOND HEADER*/}
-          <div className="sticky mx-auto bg-gray-50 font-semibold shadow-sm">
+          <div className="mx-auto bg-gray-50 font-semibold shadow-sm">
             <div className="mx-auto hidden max-w-screen-2xl items-center justify-between py-1 sm:flex sm:px-6 lg:px-8">
               {/*Navigation buttons*/}
               <div className="space-x-4">
@@ -132,7 +153,7 @@ export const Navbar = () => {
           </div>
 
           {/*Responsive panel(phone)*/}
-          <Disclosure.Panel className="relative px-2 sm:hidden">
+          <Disclosure.Panel className="relative bg-white px-2 pb-16 shadow-md sm:hidden">
             <div className="py-3 text-2xl font-semibold">Categories</div>
             <hr />
             <div className="space-y-1 py-2">
@@ -155,17 +176,34 @@ export const Navbar = () => {
             <hr />
             {/*Display sign in and join buttons*/}
             <div className="absolute right-0 flex gap-2 p-2">
-              <Link to="/login">
-                <button className="p-1 text-black hover:text-mainColor">
-                  <div>Sign in</div>
-                </button>
-              </Link>
-              <button className="rounded-3xl bg-mainColor px-4 py-2 text-white">
-                <div>Sign up</div>
-              </button>
+              {token ? (
+                <div className="space-x-4">
+                  {/* If logged in, show profile and logout buttons */}
+                  <Link to="/profile">
+                    <button className="p-1 text-black hover:text-mainColor">Profile</button>
+                  </Link>
+                  <button
+                    className="rounded-3xl bg-mainColor px-4 py-2 text-white"
+                    onClick={handleLogout}>
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <div className="space-x-4">
+                  {/* If not logged in, show login and signup buttons */}
+                  <Link to="/login">
+                    <button className="p-1 text-black hover:text-mainColor">Log in</button>
+                  </Link>
+                  <Link to="/register">
+                    <button className="rounded-3xl bg-mainColor px-4 py-2 text-white">
+                      Sign up
+                    </button>
+                  </Link>
+                </div>
+              )}
             </div>
           </Disclosure.Panel>
-        </>
+        </div>
       )}
     </Disclosure>
   );

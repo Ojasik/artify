@@ -1,17 +1,17 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-// import { Navbar } from './components/navbar';
 import { Hero } from './components/hero';
 import { Login } from './components/login';
+import { Register } from './components/register';
+import { Profile } from './components/profile';
 function App() {
   return (
     <div className="App">
       <Router>
-        {/* <Navbar /> */}
-        {/* <Hero /> */}
         <Routes>
-          <Route path="/" Component={Hero} />
-          <Route path="/profile" />
-          <Route path="/login" Component={Login} />
+          <Route path="/" element={<Hero />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
         </Routes>
       </Router>
     </div>
