@@ -4,6 +4,7 @@ const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const usersRoute = require('./routes/users');
+const artworksRoute = require('./routes/artworks');
 require('dotenv').config();
 
 const password = encodeURIComponent(process.env.DB_PASSWORD);
@@ -16,9 +17,10 @@ app.use(bodyParser.json());
 
 mongoose.connect(uri);
 
+app.use('/api/artworks', artworksRoute);
 app.use('/api/users', usersRoute);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORTD;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

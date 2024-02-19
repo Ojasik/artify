@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/images/logo.png';
 import { Disclosure } from '@headlessui/react';
@@ -10,6 +10,7 @@ import {
   MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 import { Searchbar } from './searchbar';
+import { Addartworkmodal } from './addartworkmodal';
 
 // Array with categories buttons (TEST)
 
@@ -26,6 +27,39 @@ function classNames(...classes) {
 }
 
 export const Navbar = () => {
+  const [userProfile, setUserProfile] = useState(null);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (token) {
+          const response = await fetch('http://localhost:8000/api/users/profile', {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            setUserProfile(data);
+          } else {
+            console.error('Failed to fetch user profile');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+  const [isAddArtworkModalOpen, setIsAddArtworkModalOpen] = useState(false);
+
+  const openAddArtworkModal = () => {
+    setIsAddArtworkModalOpen(true);
+  };
+
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
@@ -39,6 +73,10 @@ export const Navbar = () => {
     <Disclosure>
       {({ open }) => (
         <div className="sticky top-0">
+          <Addartworkmodal
+            isOpen={isAddArtworkModalOpen}
+            onClose={() => setIsAddArtworkModalOpen(false)}
+          />
           <div className="mx-auto bg-white font-semibold shadow-sm sm:shadow-none">
             <div className="mx-auto flex max-w-screen-2xl items-center justify-between p-2 sm:px-6 lg:px-8">
               <div className="flex items-center px-2 sm:hidden">
@@ -83,11 +121,11 @@ export const Navbar = () => {
                 {token ? (
                   <div className="hidden space-x-4 sm:block">
                     {/* If logged in, show profile and logout buttons */}
-                    <Link to="/profile">
+                    <Link to={userProfile ? `/profile/${userProfile.username}` : '#'}>
                       <button className="p-1 text-black hover:text-mainColor">Profile</button>
                     </Link>
                     <button
-                      className="rounded-3xl bg-mainColor px-4 py-2 text-white"
+                      className="rounded-3xl bg-mainColor px-4 py-2 text-white hover:bg-hoverColor"
                       onClick={handleLogout}>
                       Logout
                     </button>
@@ -99,7 +137,7 @@ export const Navbar = () => {
                       <button className="p-1 text-black hover:text-mainColor">Log in</button>
                     </Link>
                     <Link to="/register">
-                      <button className="rounded-3xl bg-mainColor px-4 py-2 text-white">
+                      <button className="rounded-3xl bg-mainColor px-4 py-2 text-white hover:bg-hoverColor">
                         Sign up
                       </button>
                     </Link>
@@ -134,6 +172,7 @@ export const Navbar = () => {
               <div className="flex items-center space-x-4">
                 <button
                   type="button"
+                  onClick={openAddArtworkModal}
                   className="rounded-3xl border-2 border-mainColor px-3 font-semibold text-black hover:bg-mainColor hover:text-white">
                   Sell items
                 </button>
@@ -183,7 +222,7 @@ export const Navbar = () => {
                     <button className="p-1 text-black hover:text-mainColor">Profile</button>
                   </Link>
                   <button
-                    className="rounded-3xl bg-mainColor px-4 py-2 text-white"
+                    className="rounded-3xl bg-mainColor px-4 py-2 text-white hover:bg-hoverColor"
                     onClick={handleLogout}>
                     Logout
                   </button>
@@ -195,7 +234,7 @@ export const Navbar = () => {
                     <button className="p-1 text-black hover:text-mainColor">Log in</button>
                   </Link>
                   <Link to="/register">
-                    <button className="rounded-3xl bg-mainColor px-4 py-2 text-white">
+                    <button className="rounded-3xl bg-mainColor px-4 py-2 text-white hover:bg-hoverColor">
                       Sign up
                     </button>
                   </Link>

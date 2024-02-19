@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './navbar';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXTwitter, faInstagram, faFacebookF } from '@fortawesome/free-brands-svg-icons';
 import { GlobeAltIcon } from '@heroicons/react/24/outline';
-import { HeartIcon } from '@heroicons/react/24/outline';
 import { Editmodal } from './editmodal';
+import { ArtworkDetailsModal } from './artworkdetailmodal';
 
 const profilePages = [
   { name: 'On sale', href: '#', current: true },
@@ -20,67 +20,114 @@ function classNames(...classes) {
 }
 
 export const Profile = () => {
+  const { username: profileUsername } = useParams();
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedArtworkDetails, setSelectedArtworkDetails] = useState(null);
+  const [userProfile, setUserProfile] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
-  const [isEditModalOpen, setIsEditModalOpen] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const handleReadMore = (artworkDetails) => {
+    setSelectedArtworkDetails(artworkDetails);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleDetailsModalClose = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedArtworkDetails(null);
+  };
 
   const openEditModal = () => {
     setIsEditModalOpen(true);
   };
 
-  const [userProfile, setUserProfile] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userArtworks, setUserArtworks] = useState([]);
+
+  // Fetch user profile data from server when component is rendered
+  const fetchProfileData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      // if (!token) {
+      //   // User is not authenticated
+      //   setIsAuthenticated(false);
+      //   setLoading(false);
+      //   return;
+      // }
+
+      const response = await fetch(`http://localhost:8000/api/users/profile/${profileUsername}`);
+      // const response = await fetch(`http://localhost:8000/api/users/profile/${profileUsername}`, {
+      //   headers: {
+      //     Authorization: `Bearer ${localStorage.getItem('token')}`
+      //   }
+      // });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUserProfile(data);
+        // setIsAuthenticated(true);
+      } else {
+        console.error('Failed to fetch profile data');
+      }
+    } catch (error) {
+      console.error('Error during profile data fetch:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Fetch user profile data from server when component is rendered
-    const fetchProfileData = async () => {
+    const fetchUserArtworks = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          // User is not authenticated
-          setIsAuthenticated(false);
-          setLoading(false);
-          return;
-        }
-
-        const response = await fetch('http://localhost:8000/api/users/profile', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-
+        const response = await fetch(
+          `http://localhost:8000/api/artworks/user/${userProfile.username}`
+        );
         if (response.ok) {
-          const data = await response.json();
-          setUserProfile(data);
-          setIsAuthenticated(true);
+          const artworks = await response.json();
+          setUserArtworks(artworks);
         } else {
-          console.error('Failed to fetch profile data');
+          console.error('Failed to fetch user artworks');
         }
       } catch (error) {
-        console.error('Error during profile data fetch:', error);
-      } finally {
-        setLoading(false);
+        console.error('Error fetching user artworks:', error);
       }
     };
 
+    // Fetch artworks only if the userProfile is available and has a username
+    if (userProfile && userProfile.username) {
+      fetchUserArtworks();
+    }
+  }, [userProfile]);
+
+  const handleProfileUpdate = () => {
     fetchProfileData();
-  }, []); // Empty dependency array ensures the effect runs only once (Works like componentDidMount)
+  };
+
+  useEffect(() => {
+    fetchProfileData();
+  }, [profileUsername]);
 
   if (loading) {
     return <p>Loading...</p>;
   }
 
-  if (!isAuthenticated) {
-    // User is not authenticated
-    navigate('/login');
-    return null;
-  }
+  // if (!isAuthenticated) {
+  //   // User is not authenticated
+  //   navigate('/login');
+  //   return null;
+  // }
 
   return (
     <>
       <Navbar />
       {isEditModalOpen && (
-        <Editmodal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} />
+        <Editmodal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onProfileUpdate={handleProfileUpdate}
+          initialProfileData={userProfile}
+        />
       )}
       <div className="mx-auto flex max-w-screen-2xl flex-col justify-between gap-0 sm:flex-row sm:gap-14">
         {/*USER CARD*/}
@@ -103,18 +150,18 @@ export const Profile = () => {
           <div className="flex flex-col items-center gap-4">
             <button className="w-52 rounded-3xl bg-mainColor py-2 text-white">Follow</button>
             <div className="flex gap-6">
-              {userProfile.profile?.facebook && (
-                <a href={userProfile.profile.facebook} target="_blank" rel="noopener noreferrer">
+              {userProfile.facebook && (
+                <a href={userProfile.facebook} target="_blank" rel="noopener noreferrer">
                   <FontAwesomeIcon className="text-xl text-gray-500" icon={faFacebookF} />
                 </a>
               )}
-              {userProfile.profile?.x && (
-                <a href={userProfile.profile.x} target="_blank" rel="noopener noreferrer">
+              {userProfile.x && (
+                <a href={userProfile.x} target="_blank" rel="noopener noreferrer">
                   <FontAwesomeIcon className="text-xl text-gray-500" icon={faXTwitter} />
                 </a>
               )}
-              {userProfile.profile?.instagram && (
-                <a href={userProfile.profile.instagram} target="_blank" rel="noopener noreferrer">
+              {userProfile.instagram && (
+                <a href={userProfile.nstagram} target="_blank" rel="noopener noreferrer">
                   <FontAwesomeIcon className="text-xl text-gray-500" icon={faInstagram} />
                 </a>
               )}
@@ -148,68 +195,34 @@ export const Profile = () => {
             ))}
           </div>
           {/*CARDS*/}
-          <div className="flex w-screen flex-col flex-wrap gap-6 px-4 pb-4 sm:w-full sm:flex-row sm:px-0 sm:pb-0 sm:pr-4 md:pr-0">
-            <div className="flex w-full flex-col items-start gap-2 rounded-2xl border p-4 md:w-[47%] lg:w-[31%]">
-              <div className="mb-6 flex h-60 w-full items-start justify-end rounded-xl bg-blue-300 p-4">
-                <div className="rounded-full bg-white p-2">
-                  <HeartIcon className="w-6" />
-                </div>
+          <div className="flex w-full flex-col flex-wrap items-start gap-6 px-4 pb-4 sm:w-full sm:flex-row sm:px-0 sm:pb-0 sm:pr-4 md:pr-0">
+            {userArtworks.map((artwork) => (
+              <div
+                key={artwork._id}
+                className="flex w-full flex-col items-start gap-2 rounded-2xl border p-4 md:w-[47%] lg:w-[31%]">
+                {artwork.images.length > 0 && (
+                  <img
+                    src={artwork.images[0].data}
+                    alt={`Artwork 1`}
+                    className="h-60 w-full rounded object-cover"
+                  />
+                )}
+                <h2 className="text-2xl">{artwork.title}</h2>
+                <div className="text-lg font-bold">${artwork.price}</div>
+                <button className="text-xl font-bold text-mainColor">Buy now</button>
+                <button
+                  onClick={() => handleReadMore(artwork)}
+                  className="text-xl font-bold text-mainColor">
+                  Read More
+                </button>
               </div>
-              <h2 className="text-2xl">Amazing painting</h2>
-              <div className="text-lg font-bold">2200 $</div>
-              <button className="text-xl font-bold text-mainColor">Buy now</button>
-            </div>
-            <div className="flex w-full flex-col items-start gap-2 rounded-2xl border p-4 md:w-[47%] lg:w-[31%]">
-              <div className="mb-6 flex h-60 w-full items-start justify-end rounded-xl bg-blue-300 p-4">
-                <div className="rounded-full bg-white p-2">
-                  <HeartIcon className="w-6" />
-                </div>
-              </div>
-              <h2 className="text-2xl">Amazing painting</h2>
-              <div className="text-lg font-bold">2200 $</div>
-              <button className="text-xl font-bold text-mainColor">Buy now</button>
-            </div>
-            <div className="flex w-full flex-col items-start gap-2 rounded-2xl border p-4 md:w-[47%] lg:w-[31%]">
-              <div className="mb-6 flex h-60 w-full items-start justify-end rounded-xl bg-blue-300 p-4">
-                <div className="rounded-full bg-white p-2">
-                  <HeartIcon className="w-6" />
-                </div>
-              </div>
-              <h2 className="text-2xl">Amazing painting</h2>
-              <div className="text-lg font-bold">2200 $</div>
-              <button className="text-xl font-bold text-mainColor">Buy now</button>
-            </div>
-            <div className="flex w-full flex-col items-start gap-2 rounded-2xl border p-4 md:w-[47%] lg:w-[31%]">
-              <div className="mb-6 flex h-60 w-full items-start justify-end rounded-xl bg-blue-300 p-4">
-                <div className="rounded-full bg-white p-2">
-                  <HeartIcon className="w-6" />
-                </div>
-              </div>
-              <h2 className="text-2xl">Amazing painting</h2>
-              <div className="text-lg font-bold">2200 $</div>
-              <button className="text-xl font-bold text-mainColor">Buy now</button>
-            </div>
-            <div className="flex w-full flex-col items-start gap-2 rounded-2xl border p-4 md:w-[47%] lg:w-[31%]">
-              <div className="mb-6 flex h-60 w-full items-start justify-end rounded-xl bg-blue-300 p-4">
-                <div className="rounded-full bg-white p-2">
-                  <HeartIcon className="w-6" />
-                </div>
-              </div>
-              <h2 className="text-2xl">Amazing painting</h2>
-              <div className="text-lg font-bold">2200 $</div>
-              <button className="text-xl font-bold text-mainColor">Buy now</button>
-            </div>
-            <div className="flex w-full flex-col items-start gap-2 rounded-2xl border p-4 md:w-[47%] lg:w-[31%]">
-              <div className="mb-6 flex h-60 w-full items-start justify-end rounded-xl bg-blue-300 p-4">
-                <div className="rounded-full bg-white p-2">
-                  <HeartIcon className="w-6" />
-                </div>
-              </div>
-              <h2 className="text-2xl">Amazing painting</h2>
-              <div className="text-lg font-bold">2200 $</div>
-              <button className="text-xl font-bold text-mainColor">Buy now</button>
-            </div>
+            ))}
           </div>
+          <ArtworkDetailsModal
+            isOpen={isDetailsModalOpen}
+            onClose={handleDetailsModalClose}
+            artworkDetails={selectedArtworkDetails || {}}
+          />
         </div>
       </div>
     </>

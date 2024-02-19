@@ -113,4 +113,88 @@ router.get('/profile', authenticateJWT, async (req, res) => {
   }
 });
 
+router.get('/profile/:username', async (req, res) => {
+  try {
+    const requestedUsername = req.params.username;
+
+    // Fetch user profile information from the database
+    const userProfile = await User.findOne({ username: requestedUsername }, { password: 0 }); // Exclude password field
+    if (!userProfile) {
+      return res.status(404).json({ message: 'User profile not found' });
+    }
+
+    // Destructure user profile data
+    const { username, firstname, lastname, profile, created_at } = userProfile;
+
+    // Extract additional profile information
+    const { description = '', website = '', x = '', instagram = '', facebook = '' } = profile || {};
+
+    // Return the desired information
+    res.status(200).json({
+      username,
+      firstname,
+      lastname,
+      description,
+      website,
+      x,
+      instagram,
+      facebook,
+      created_at
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.put('/profile', authenticateJWT, async (req, res) => {
+  try {
+    const { username } = req.user;
+    const {
+      username: newUsername,
+      description,
+      website,
+      x,
+      instagram,
+      facebook,
+      firstName,
+      lastName
+    } = req.body;
+
+    const updatedProfile = await User.findOneAndUpdate(
+      { username },
+      {
+        $set: {
+          firstname: firstName,
+          lastname: lastName,
+          username: newUsername,
+          'profile.description': description,
+          'profile.website': website,
+          'profile.x': x,
+          'profile.instagram': instagram,
+          'profile.facebook': facebook
+        }
+      },
+      { new: true, fields: { password: 0 } }
+    );
+
+    if (!updatedProfile) {
+      return res.status(404).json({ message: 'User profile not found' });
+    }
+
+    const newToken = jwt.sign(
+      { username: newUsername, role: updatedProfile.role },
+      process.env.JWT,
+      {
+        expiresIn: '1h'
+      }
+    );
+
+    res.status(200).json({ updatedProfile, newToken });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 module.exports = router;

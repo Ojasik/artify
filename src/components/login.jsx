@@ -34,7 +34,7 @@ export const Login = () => {
           localStorage.setItem('token', data.token);
           navigate('/');
         } else {
-          console.error(data.message); // Login failed
+          console.error(data.message);
         }
       } catch (error) {
         console.error('Error during login:', error);
