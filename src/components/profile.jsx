@@ -129,7 +129,7 @@ export const Profile = () => {
           initialProfileData={userProfile}
         />
       )}
-      <div className="mx-auto flex max-w-screen-2xl flex-col justify-between gap-0 sm:flex-row sm:gap-14">
+      <div className="mx-auto flex max-w-screen-2xl flex-col gap-0 sm:flex-row">
         {/*USER CARD*/}
         <div className="flex w-full flex-col items-center gap-4 pt-12 sm:w-80">
           {/*User Icon*/}
@@ -195,11 +195,11 @@ export const Profile = () => {
             ))}
           </div>
           {/*CARDS*/}
-          <div className="flex w-full flex-col flex-wrap items-start gap-6 px-4 pb-4 sm:w-full sm:flex-row sm:px-0 sm:pb-0 sm:pr-4 md:pr-0">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {userArtworks.map((artwork) => (
               <div
                 key={artwork._id}
-                className="flex w-full flex-col items-start gap-2 rounded-2xl border p-4 md:w-[47%] lg:w-[31%]">
+                className="flex flex-col items-start gap-2 rounded-2xl border p-4">
                 {artwork.images.length > 0 && (
                   <img
                     src={artwork.images[0].data}

@@ -7,7 +7,8 @@ export const Addartworkmodal = ({ isOpen, onClose }) => {
     title: '',
     images: [],
     price: '',
-    about: ''
+    about: '',
+    category: 'painting'
   });
 
   const handleInputChange = (e) => {
@@ -28,6 +29,7 @@ export const Addartworkmodal = ({ isOpen, onClose }) => {
       formDataToSend.append('title', formData.title);
       formDataToSend.append('price', formData.price);
       formDataToSend.append('about', formData.about);
+      formDataToSend.append('category', formData.category);
 
       formData.images.forEach((image, index) => {
         formDataToSend.append(`images`, image);
@@ -87,6 +89,15 @@ export const Addartworkmodal = ({ isOpen, onClose }) => {
                       onChange={handleInputChange}
                       required
                     />
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={handleInputChange}
+                      className="w-80 rounded-full border border-black p-2 px-4">
+                      <option value="painting">Painting</option>
+                      <option value="sculpture">Sculpture</option>
+                      <option value="literature">Literature</option>
+                    </select>
                     <textarea
                       name="about"
                       className="w-80 rounded-2xl border border-black p-2 px-4"

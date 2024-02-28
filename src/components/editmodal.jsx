@@ -21,11 +21,11 @@ export const Editmodal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
       firstName: initialProfileData.firstname || '',
       lastName: initialProfileData.lastname || '',
       username: initialProfileData.username || '',
-      description: initialProfileData.profile?.description || '',
-      website: initialProfileData.profile?.website || '',
-      x: initialProfileData.profile?.x || '',
-      instagram: initialProfileData.profile?.instagram || '',
-      facebook: initialProfileData.profile?.facebook || ''
+      description: initialProfileData.description || '',
+      website: initialProfileData.website || '',
+      x: initialProfileData.x || '',
+      instagram: initialProfileData.instagram || '',
+      facebook: initialProfileData.facebook || ''
     });
   }, [initialProfileData]);
 
@@ -190,12 +190,10 @@ Editmodal.propTypes = {
     firstname: PropTypes.string,
     lastname: PropTypes.string,
     username: PropTypes.string,
-    profile: PropTypes.shape({
-      description: PropTypes.string,
-      website: PropTypes.string,
-      x: PropTypes.string,
-      instagram: PropTypes.string,
-      facebook: PropTypes.string
-    })
+    description: PropTypes.string,
+    website: PropTypes.string,
+    x: PropTypes.string,
+    instagram: PropTypes.string,
+    facebook: PropTypes.string
   })
 };

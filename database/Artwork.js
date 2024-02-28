@@ -20,6 +20,11 @@ const artworkSchema = new mongoose.Schema({
     required: true
   },
   status: { type: String, enum: ['uploaded', 'verified', 'sold'], default: 'uploaded' },
+  category: {
+    type: String,
+    enum: ['painting', 'sculpture', 'literature'],
+    required: true
+  },
   createdBy: { type: String, required: true }
 });
 

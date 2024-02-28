@@ -29,7 +29,7 @@ const upload = multer({ storage: storage, limits: { fileSize: 5 * 1024 * 1024 } 
 // Route to add an artwork
 router.post('/add-artwork', authenticateJWT, upload.array('images'), async (req, res) => {
   try {
-    const { title, price, about } = req.body;
+    const { title, price, category, about } = req.body;
     const { username } = req.user;
 
     const images = req.files.map((file) => ({ data: file.buffer, contentType: file.mimetype }));
@@ -39,6 +39,7 @@ router.post('/add-artwork', authenticateJWT, upload.array('images'), async (req,
       title,
       images,
       price,
+      category,
       about,
       createdBy: username
     });
@@ -119,4 +120,23 @@ router.put('/:artworkId', authenticateJWT, async (req, res) => {
   }
 });
 
+router.get('/', async (req, res) => {
+  try {
+    const artworks = await Artwork.find();
+
+    const artworksImagesURL = artworks.map((artwork) => {
+      const imagesURL = artwork.images.map((image) => ({
+        data: `data:${image.contentType};base64,${image.data.toString('base64')}`,
+        contentType: image.contentType
+      }));
+
+      return { ...artwork.toObject(), images: imagesURL };
+    });
+
+    res.status(200).json(artworksImagesURL);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 module.exports = router;

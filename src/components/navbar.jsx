@@ -9,13 +9,13 @@ import {
   HeartIcon,
   MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
-import { Searchbar } from './searchbar';
 import { Addartworkmodal } from './addartworkmodal';
 
 // Array with categories buttons (TEST)
 
 const categories = [
-  { name: 'Painting', href: '#', current: true },
+  { name: 'All', href: '#', current: true },
+  { name: 'Painting', href: '#', current: false },
   { name: 'Sculpture', href: '#', current: false },
   { name: 'Literature', href: '#', current: false }
 ];
@@ -98,9 +98,7 @@ export const Navbar = () => {
                   </div>
                 </Link>
               </div>
-              <div className="hidden sm:block">
-                <Searchbar /> {/*In process*/}
-              </div>
+
               {/*Another buttons(like, cart, search)*/}
               <div>
                 <div className="flex items-center gap-4 pr-2 sm:hidden">
