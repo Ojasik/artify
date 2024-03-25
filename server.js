@@ -13,7 +13,9 @@ const uri = `mongodb+srv://ojasik:${password}@artify.ez4dwrl.mongodb.net/artify?
 const app = express();
 
 app.use(cors());
-app.use(bodyParser.json());
+// app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 mongoose.connect(uri);
 

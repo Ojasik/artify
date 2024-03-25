@@ -20,6 +20,7 @@ export const Hero = () => {
 
     fetchArtworks();
   }, []);
+
   return (
     <>
       <Navbar />

@@ -78,48 +78,6 @@ router.get('/user/:username', async (req, res) => {
   }
 });
 
-// Route to fetch artwork details
-router.get('/:artworkId', authenticateJWT, async (req, res) => {
-  try {
-    const { artworkId } = req.params;
-
-    // Fetch artwork details from the database
-    const artwork = await Artwork.findById(artworkId);
-    if (!artwork) {
-      return res.status(404).json({ message: 'Artwork not found' });
-    }
-
-    res.status(200).json(artwork);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
-// Route to update artwork information
-router.put('/:artworkId', authenticateJWT, async (req, res) => {
-  try {
-    const { artworkId } = req.params;
-    const { title, images, price, about } = req.body;
-
-    // Update artwork information in the database
-    const updatedArtwork = await Artwork.findByIdAndUpdate(
-      artworkId,
-      { $set: { title, images, price, about } },
-      { new: true }
-    );
-
-    if (!updatedArtwork) {
-      return res.status(404).json({ message: 'Artwork not found' });
-    }
-
-    res.status(200).json(updatedArtwork);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
 router.get('/', async (req, res) => {
   try {
     const artworks = await Artwork.find();
@@ -139,4 +97,157 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+// router.put('/:id', authenticateJWT, upload.array('images'), async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const { title, price, category, about } = req.body;
+//     const newImages = req.files.map((file) => ({ data: file.buffer, contentType: file.mimetype }));
+
+//     const updatedArtwork = await Artwork.findByIdAndUpdate(
+//       id,
+//       { title, price, category, about },
+//       { new: true }
+//     );
+
+//     if (!updatedArtwork) {
+//       return res.status(404).json({ message: 'Artwork not found' });
+//     }
+
+//     res.status(200).json(updatedArtwork);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: 'Internal server error' });
+//   }
+// });
+
+// router.put('/:id', authenticateJWT, upload.array('images'), async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const { title, price, category, about } = req.body;
+//     const newImages = req.files.map((file) => ({ data: file.buffer, contentType: file.mimetype }));
+
+//     let updateObject = { title, price, category, about };
+
+//     if (newImages.length > 0) {
+//       updateObject.images = newImages;
+//     }
+
+//     const updatedArtwork = await Artwork.findByIdAndUpdate(id, updateObject, { new: true });
+
+//     if (!updatedArtwork) {
+//       return res.status(404).json({ message: 'Artwork not found' });
+//     }
+
+//     res.status(200).json(updatedArtwork);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: 'Internal server error' });
+//   }
+// });
+
+// router.put('/:id', authenticateJWT, upload.array('images'), async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const { title, price, category, about } = req.body;
+
+//     // Retrieve existing artwork
+//     const existingArtwork = await Artwork.findById(id);
+//     const existingImages = existingArtwork.images;
+
+//     // Map new files to an array of objects with data and contentType
+//     const newImages = req.files.map((file) => ({ data: file.buffer, contentType: file.mimetype }));
+
+//     // Combine existing and new images
+//     const combinedImages = [...existingImages, ...newImages];
+
+//     // Update artwork with new data including combined images
+//     const updatedArtwork = await Artwork.findByIdAndUpdate(
+//       id,
+//       { title, price, category, about, images: combinedImages },
+//       { new: true }
+//     );
+
+//     if (!updatedArtwork) {
+//       return res.status(404).json({ message: 'Artwork not found' });
+//     }
+
+//     res.status(200).json(updatedArtwork);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: 'Internal server error' });
+//   }
+// });
+
+router.put('/:id', authenticateJWT, upload.array('images'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, price, category, about, removedImages } = req.body;
+
+    // Parse the removedImages array from the request body
+    const parsedRemovedImages = JSON.parse(removedImages);
+
+    // Fetch the existing artwork
+    const existingArtwork = await Artwork.findById(id);
+
+    // Filter out the removed images from the existing artwork's images array
+    const existingImages = existingArtwork.images.filter(
+      (image, index) => !parsedRemovedImages.includes(index)
+    );
+
+    // Prepare the new images from the request
+    const newImages = req.files.map((file) => ({
+      data: file.buffer, // Convert buffer to base64
+      contentType: file.mimetype
+    }));
+
+    // Combine the existing and new images
+    const combinedImages = [...existingImages, ...newImages];
+
+    // Update the artwork with the new information
+    const updatedArtwork = await Artwork.findByIdAndUpdate(
+      id,
+      { title, price, category, about, images: combinedImages },
+      { new: true }
+    );
+
+    if (!updatedArtwork) {
+      return res.status(404).json({ message: 'Artwork not found' });
+    }
+
+    // Convert image data to data URLs
+    const updatedArtworkWithImageURLs = {
+      ...updatedArtwork.toObject(),
+      images: updatedArtwork.images.map((image) => ({
+        data: `data:${image.contentType};base64,${image.data.toString('base64')}`,
+        contentType: image.contentType
+      }))
+    };
+
+    res.status(200).json(updatedArtworkWithImageURLs);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Delete the artwork from the database
+    const result = await Artwork.deleteOne({ _id: id });
+
+    // Check if the artwork was found and deleted
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ message: 'Artwork not found' });
+    }
+
+    res.status(200).json({ message: 'Artwork deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 module.exports = router;

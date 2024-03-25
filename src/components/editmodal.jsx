@@ -59,7 +59,7 @@ export const Editmodal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
         }
         console.log('Profile updated successfully');
         onProfileUpdate();
-        onClose(); // Close the modal after submitting the form
+        onClose();
       } else {
         console.error('Failed to update profile');
       }

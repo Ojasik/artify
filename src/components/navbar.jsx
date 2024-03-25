@@ -29,31 +29,6 @@ function classNames(...classes) {
 export const Navbar = () => {
   const [userProfile, setUserProfile] = useState(null);
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (token) {
-          const response = await fetch('http://localhost:8000/api/users/profile', {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            setUserProfile(data);
-          } else {
-            console.error('Failed to fetch user profile');
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching user profile:', error);
-      }
-    };
-
-    fetchUserProfile();
-  }, []);
   const [isAddArtworkModalOpen, setIsAddArtworkModalOpen] = useState(false);
 
   const openAddArtworkModal = () => {
@@ -62,6 +37,9 @@ export const Navbar = () => {
 
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
+
+  const decodedToken = token ? JSON.parse(atob(token.split('.')[1])) : null;
+  const loggedInUsername = decodedToken ? decodedToken.username : null;
 
   const handleLogout = () => {
     // Clear the token on logout
@@ -119,7 +97,7 @@ export const Navbar = () => {
                 {token ? (
                   <div className="hidden space-x-4 sm:block">
                     {/* If logged in, show profile and logout buttons */}
-                    <Link to={userProfile ? `/profile/${userProfile.username}` : '#'}>
+                    <Link to={`/profile/${loggedInUsername}`}>
                       <button className="p-1 text-black hover:text-mainColor">Profile</button>
                     </Link>
                     <button
