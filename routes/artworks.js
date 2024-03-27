@@ -183,12 +183,19 @@ router.put('/:id', authenticateJWT, upload.array('images'), async (req, res) => 
   try {
     const { id } = req.params;
     const { title, price, category, about, removedImages } = req.body;
+    const { username } = req.user;
 
     // Parse the removedImages array from the request body
     const parsedRemovedImages = JSON.parse(removedImages);
 
     // Fetch the existing artwork
     const existingArtwork = await Artwork.findById(id);
+
+    if (existingArtwork.createdBy !== username) {
+      return res
+        .status(403)
+        .json({ message: 'Forbidden: You are not the creator of this artwork' });
+    }
 
     // Filter out the removed images from the existing artwork's images array
     const existingImages = existingArtwork.images.filter(
@@ -231,16 +238,32 @@ router.put('/:id', authenticateJWT, upload.array('images'), async (req, res) => 
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticateJWT, async (req, res) => {
   try {
     const { id } = req.params;
+    const { username } = req.user;
+
+    // Find the artwork in the database
+    const artwork = await Artwork.findById(id);
+
+    // Check if the artwork exists
+    if (!artwork) {
+      return res.status(404).json({ message: 'Artwork not found' });
+    }
+
+    // Check if the authenticated user is the creator of the artwork
+    if (artwork.createdBy !== username) {
+      return res
+        .status(403)
+        .json({ message: 'Forbidden: You are not the creator of this artwork' });
+    }
 
     // Delete the artwork from the database
     const result = await Artwork.deleteOne({ _id: id });
 
-    // Check if the artwork was found and deleted
+    // Check if the artwork was successfully deleted
     if (result.deletedCount === 0) {
-      return res.status(404).json({ message: 'Artwork not found' });
+      return res.status(500).json({ message: 'Failed to delete artwork' });
     }
 
     res.status(200).json({ message: 'Artwork deleted successfully' });

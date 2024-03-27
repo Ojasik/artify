@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Dialog } from '@headlessui/react';
 
-export const Addartworkmodal = ({ isOpen, onClose }) => {
-  const [formData, setFormData] = useState({
+export const Addartworkmodal = ({ isOpen, onClose, onArtworkUpdate }) => {
+  const initialFormData = {
     title: '',
     images: [],
     price: '',
     about: '',
     category: 'painting'
-  });
+  };
+
+  const [formData, setFormData] = useState(initialFormData);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -45,6 +47,8 @@ export const Addartworkmodal = ({ isOpen, onClose }) => {
 
       if (response.ok) {
         console.log('Artwork added successfully');
+        onArtworkUpdate();
+        setFormData(initialFormData);
         onClose();
       } else {
         console.error('Failed to add artwork');
@@ -52,6 +56,10 @@ export const Addartworkmodal = ({ isOpen, onClose }) => {
     } catch (error) {
       console.error('Error during artwork addition:', error);
     }
+  };
+
+  const resetForm = () => {
+    setFormData(initialFormData);
   };
 
   return (
@@ -142,7 +150,10 @@ export const Addartworkmodal = ({ isOpen, onClose }) => {
               <button
                 type="button"
                 className="mt-3 inline-flex w-full justify-center rounded-full bg-white px-6 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                onClick={onClose}>
+                onClick={() => {
+                  resetForm();
+                  onClose();
+                }}>
                 Cancel
               </button>
             </div>
@@ -155,5 +166,6 @@ export const Addartworkmodal = ({ isOpen, onClose }) => {
 
 Addartworkmodal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
+  onArtworkUpdate: PropTypes.func,
   onClose: PropTypes.func.isRequired
 };

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/images/logo.png';
+import PropTypes from 'prop-types';
 import { Disclosure } from '@headlessui/react';
 import {
   Bars3Icon,
@@ -26,7 +27,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
-export const Navbar = () => {
+export const Navbar = ({ onArtworkUpdate }) => {
   const [userProfile, setUserProfile] = useState(null);
 
   const [isAddArtworkModalOpen, setIsAddArtworkModalOpen] = useState(false);
@@ -54,6 +55,7 @@ export const Navbar = () => {
           <Addartworkmodal
             isOpen={isAddArtworkModalOpen}
             onClose={() => setIsAddArtworkModalOpen(false)}
+            onArtworkUpdate={onArtworkUpdate}
           />
           <div className="mx-auto bg-white font-semibold shadow-sm sm:shadow-none">
             <div className="mx-auto flex max-w-screen-2xl items-center justify-between p-2 sm:px-6 lg:px-8">
@@ -222,4 +224,7 @@ export const Navbar = () => {
       )}
     </Disclosure>
   );
+};
+Navbar.propTypes = {
+  onArtworkUpdate: PropTypes.func
 };

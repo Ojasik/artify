@@ -1,8 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './navbar';
+import ArtworkCard from './ArtworkCard';
+import { ArtworkDetailsModal } from './artworkdetailmodal';
 
 export const Hero = () => {
   const [artworks, setArtworks] = useState([]);
+  const [selectedArtworkDetails, setSelectedArtworkDetails] = useState(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+
+  const addToCart = async (artworkId) => {
+    try {
+      const response = await fetch('http://localhost:8000/api/cart/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ artwork_id: artworkId })
+      });
+
+      if (response.ok) {
+        console.log('Artwork added to cart successfully');
+      } else {
+        console.error('Failed to add artwork to cart');
+      }
+    } catch (error) {
+      console.error('Error adding artwork to cart:', error);
+    }
+  };
+
   useEffect(() => {
     const fetchArtworks = async () => {
       try {
@@ -21,26 +47,35 @@ export const Hero = () => {
     fetchArtworks();
   }, []);
 
+  const handleReadMore = (artworkDetails) => {
+    setSelectedArtworkDetails(artworkDetails);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleDetailsModalClose = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedArtworkDetails(null);
+  };
+
   return (
     <>
       <Navbar />
       <div className="m-auto grid max-w-screen-2xl grid-cols-1 gap-4 p-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {artworks.map((artwork) => (
-          <div key={artwork._id} className="flex flex-col items-start gap-2 rounded-2xl border p-4">
-            {artwork.images.length > 0 && (
-              <img
-                src={artwork.images[0].data}
-                alt={`Artwork 1`}
-                className="h-60 w-full rounded object-cover"
-              />
-            )}
-            <h2 className="text-2xl">{artwork.title}</h2>
-            <div className="text-lg font-bold">${artwork.price}</div>
-            <button className="text-xl font-bold text-mainColor">Buy now</button>
-            <button className="text-xl font-bold text-mainColor">Read More</button>
-          </div>
+          <ArtworkCard
+            key={artwork._id}
+            artwork={artwork}
+            handleReadMore={handleReadMore}
+            showBuyButton={true}
+            addToCart={addToCart}
+          />
         ))}
       </div>
+      <ArtworkDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={handleDetailsModalClose}
+        artworkDetails={selectedArtworkDetails || {}}
+      />
     </>
   );
 };

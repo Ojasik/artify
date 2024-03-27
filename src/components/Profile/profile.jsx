@@ -27,6 +27,15 @@ export const Profile = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isArtworkEditModalOpen, setIsArtworkEditModalOpen] = useState(false);
   const [selectedArtworkForEdit, setSelectedArtworkForEdit] = useState(null);
+  const [loggedInUsername, setLoggedInUsername] = useState(null);
+
+  const getLoggedInUsername = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));
+      setLoggedInUsername(decodedToken.username);
+    }
+  };
 
   const handleReadMore = (artworkDetails) => {
     setSelectedArtworkDetails(artworkDetails);
@@ -76,35 +85,37 @@ export const Profile = () => {
     }
   };
 
+  const fetchUserArtworks = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/api/artworks/user/${userProfile.username}`
+      );
+      if (response.ok) {
+        const artworks = await response.json();
+        setUserArtworks(artworks);
+      } else {
+        console.error('Failed to fetch user artworks');
+      }
+    } catch (error) {
+      console.error('Error fetching user artworks:', error);
+    }
+  };
+
   useEffect(() => {
     fetchProfileData();
+    getLoggedInUsername();
   }, [profileUsername]);
 
   useEffect(() => {
-    const fetchUserArtworks = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:8000/api/artworks/user/${userProfile.username}`
-        );
-        if (response.ok) {
-          const artworks = await response.json();
-          setUserArtworks(artworks);
-        } else {
-          console.error('Failed to fetch user artworks');
-        }
-      } catch (error) {
-        console.error('Error fetching user artworks:', error);
-      }
-    };
-
-    // Fetch artworks only if the userProfile is available and has a username
-    if (userProfile && userProfile.username) {
-      fetchUserArtworks();
-    }
+    fetchUserArtworks();
   }, [userProfile]);
 
   const handleProfileUpdate = () => {
     fetchProfileData();
+  };
+
+  const handleArtworkUpdate = () => {
+    fetchUserArtworks();
   };
 
   const handleDeleteArtwork = async (artworkId) => {
@@ -135,7 +146,7 @@ export const Profile = () => {
 
   return (
     <>
-      <Navbar />
+      <Navbar onArtworkUpdate={handleArtworkUpdate} />
       {isEditModalOpen && (
         <Editmodal
           isOpen={isEditModalOpen}
@@ -156,6 +167,9 @@ export const Profile = () => {
                 handleReadMore={handleReadMore}
                 openArtworkEditModal={openArtworkEditModal}
                 handleDeleteArtwork={handleDeleteArtwork}
+                showBuyButton={loggedInUsername !== profileUsername}
+                showEditButton={loggedInUsername == profileUsername}
+                showDeleteButton={loggedInUsername == profileUsername}
               />
             ))}
           </div>
