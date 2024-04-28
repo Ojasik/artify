@@ -19,13 +19,18 @@ const artworkSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  status: { type: String, enum: ['uploaded', 'verified', 'sold'], default: 'uploaded' },
+  status: { type: String, enum: ['Uploaded', 'Verified', 'Sold'], default: 'Uploaded' },
+  isAvailable: { type: Boolean, default: true },
   category: {
     type: String,
-    enum: ['painting', 'sculpture', 'literature'],
+    enum: ['Painting', 'Sculpture', 'Literature'],
     required: true
   },
-  createdBy: { type: String, required: true }
+  createdBy: { type: String, required: true },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 // Create and export artwork model

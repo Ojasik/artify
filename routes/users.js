@@ -39,7 +39,7 @@ router.post('/register', async (req, res) => {
       lastname,
       email,
       password,
-      role: 'regular'
+      role: 'Regular'
     });
 
     // Save the user to the database
@@ -131,7 +131,14 @@ router.get('/profile/:username', authenticateJWT, async (req, res) => {
     const { username, firstname, lastname, profile, created_at } = userProfile;
 
     // Extract additional profile information
-    const { description = '', website = '', x = '', instagram = '', facebook = '' } = profile || {};
+    const {
+      description = '',
+      website = '',
+      x = '',
+      instagram = '',
+      facebook = '',
+      avatar = ''
+    } = profile || {};
 
     // Return the desired information
     res.status(200).json({
@@ -143,6 +150,7 @@ router.get('/profile/:username', authenticateJWT, async (req, res) => {
       x,
       instagram,
       facebook,
+      avatar,
       created_at
     });
   } catch (error) {
@@ -162,7 +170,8 @@ router.put('/profile', authenticateJWT, async (req, res) => {
       instagram,
       facebook,
       firstName,
-      lastName
+      lastName,
+      avatar
     } = req.body;
 
     const updatedProfile = await User.findOneAndUpdate(
@@ -176,7 +185,8 @@ router.put('/profile', authenticateJWT, async (req, res) => {
           'profile.website': website,
           'profile.x': x,
           'profile.instagram': instagram,
-          'profile.facebook': facebook
+          'profile.facebook': facebook,
+          'profile.avatar': avatar
         }
       },
       { new: true, fields: { password: 0 } }
@@ -193,7 +203,6 @@ router.put('/profile', authenticateJWT, async (req, res) => {
         expiresIn: '1h'
       }
     );
-
     res.status(200).json({ updatedProfile, newToken });
   } catch (error) {
     console.error(error);

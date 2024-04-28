@@ -29,6 +29,28 @@ const Cart = () => {
     }
   };
 
+  const handleDeleteArtwork = async (itemId) => {
+    try {
+      // Make a DELETE request to remove the artwork from the cart
+      const response = await fetch(`http://localhost:8000/api/cart/${itemId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        // Remove the deleted artwork from the cart items list
+        setCartItems((prevCartItems) => prevCartItems.filter((item) => item._id !== itemId));
+        console.log('Artwork deleted from cart successfully');
+      } else {
+        console.error('Failed to delete artwork from cart');
+      }
+    } catch (error) {
+      console.error('Error deleting artwork from cart:', error);
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -39,7 +61,7 @@ const Cart = () => {
             artwork={item.artwork_id}
             handleReadMore={() => {}}
             openArtworkEditModal={() => {}}
-            handleDeleteArtwork={() => {}}
+            handleDeleteArtwork={() => handleDeleteArtwork(item._id)}
             showBuyButton={false}
             showEditButton={false}
             showDeleteButton={true}

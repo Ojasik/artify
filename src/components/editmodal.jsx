@@ -4,6 +4,7 @@ import { Dialog } from '@headlessui/react';
 
 export const Editmodal = ({ isOpen, onClose, onProfileUpdate, initialProfileData }) => {
   const cancelButtonRef = useRef(null);
+  const fileInputRef = useRef(null);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -12,7 +13,8 @@ export const Editmodal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
     website: '',
     x: '',
     instagram: '',
-    facebook: ''
+    facebook: '',
+    avatar: ''
   });
 
   useEffect(() => {
@@ -25,7 +27,8 @@ export const Editmodal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
       website: initialProfileData.website || '',
       x: initialProfileData.x || '',
       instagram: initialProfileData.instagram || '',
-      facebook: initialProfileData.facebook || ''
+      facebook: initialProfileData.facebook || '',
+      avatar: initialProfileData.avatar || ''
     });
   }, [initialProfileData]);
 
@@ -33,6 +36,17 @@ export const Editmodal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     console.log(formData);
+  };
+
+  const handleFileInputChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, avatar: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleFormSubmit = async (e) => {
@@ -156,6 +170,41 @@ export const Editmodal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
                       onChange={handleInputChange}
                       placeholder="Description (optional)"
                     />
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleFileInputChange}
+                    />
+                    <button
+                      type="button"
+                      className="cursor-pointer"
+                      onClick={() => fileInputRef.current.click()}>
+                      {formData.avatar ? (
+                        <img
+                          src={formData.avatar}
+                          alt="Profile Icon"
+                          className="h-24 w-24 rounded-full"
+                        />
+                      ) : (
+                        <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gray-200">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            className="h-12 w-12 text-gray-400">
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                            />
+                          </svg>
+                        </div>
+                      )}
+                    </button>
                   </form>
                 </div>
               </div>
@@ -194,6 +243,7 @@ Editmodal.propTypes = {
     website: PropTypes.string,
     x: PropTypes.string,
     instagram: PropTypes.string,
-    facebook: PropTypes.string
+    facebook: PropTypes.string,
+    avatar: PropTypes.string
   })
 };

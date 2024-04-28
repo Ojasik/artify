@@ -28,8 +28,6 @@ function classNames(...classes) {
 }
 
 export const Navbar = ({ onArtworkUpdate }) => {
-  const [userProfile, setUserProfile] = useState(null);
-
   const [isAddArtworkModalOpen, setIsAddArtworkModalOpen] = useState(false);
 
   const openAddArtworkModal = () => {
@@ -159,11 +157,13 @@ export const Navbar = ({ onArtworkUpdate }) => {
                   className="rounded-full bg-gray-50 p-1 text-black hover:text-mainColor focus:outline-none">
                   <HeartIcon className="h-8 w-8" />
                 </button>
-                <button
-                  type="button"
-                  className="rounded-full bg-gray-50 p-1 text-black hover:text-mainColor focus:outline-none">
-                  <ShoppingCartIcon className="h-8 w-8" />
-                </button>
+                <Link to="/cart">
+                  <button
+                    type="button"
+                    className="rounded-full bg-gray-50 p-1 text-black hover:text-mainColor focus:outline-none">
+                    <ShoppingCartIcon className="h-8 w-8" />
+                  </button>
+                </Link>
               </div>
             </div>
             <hr className="hidden sm:block" />

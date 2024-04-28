@@ -80,7 +80,7 @@ router.get('/user/:username', async (req, res) => {
 
 router.get('/', async (req, res) => {
   try {
-    const artworks = await Artwork.find();
+    const artworks = await Artwork.find({ isAvailable: true });
 
     const artworksImagesURL = artworks.map((artwork) => {
       const imagesURL = artwork.images.map((image) => ({

@@ -169,9 +169,9 @@ const ArtworkEditModal = ({ isOpen, onClose, artwork, updateArtworks }) => {
                       value={formData.category}
                       onChange={handleInputChange}
                       className="w-80 rounded-full border border-black p-2 px-4">
-                      <option value="painting">Painting</option>
-                      <option value="sculpture">Sculpture</option>
-                      <option value="literature">Literature</option>
+                      <option value="Painting">Painting</option>
+                      <option value="Sculpture">Sculpture</option>
+                      <option value="Literature">Literature</option>
                     </select>
                     <input
                       type="text"

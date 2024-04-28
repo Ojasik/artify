@@ -5,8 +5,16 @@ import { Navbar } from './navbar';
 export const AdminPage = () => {
   const [users, setUsers] = useState([]);
   const [artworks, setArtworks] = useState([]);
+  const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));
+      setUserRole(decodedToken.role);
+      console.log('User Role:', decodedToken.role);
+    }
+
     const fetchUsers = async () => {
       try {
         const response = await fetch('http://localhost:8000/api/users', {
@@ -48,6 +56,15 @@ export const AdminPage = () => {
     fetchUsers();
     fetchArtworks();
   }, []);
+
+  if (userRole !== 'moderator' && userRole !== 'admin') {
+    return (
+      <div>
+        <h1>Access Denied</h1>
+        <p>You do not have permission to access this page.</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -153,7 +170,16 @@ export const AdminPage = () => {
                   About
                 </th>
                 <th className="bg-gray-50 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                  Status
+                </th>
+                <th className="bg-gray-50 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                   Created By
+                </th>
+                <th className="bg-gray-50 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                  Open
+                </th>
+                <th className="bg-gray-50 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                  Edit
                 </th>
               </tr>
             </thead>
@@ -163,12 +189,19 @@ export const AdminPage = () => {
                   <td className="whitespace-nowrap px-6 py-4">{artwork.title}</td>
                   <td className="whitespace-nowrap px-6 py-4">${artwork.price}</td>
                   <td className="whitespace-nowrap px-6 py-4">{artwork.about}</td>
+                  <td className="whitespace-nowrap px-6 py-4">{artwork.status}</td>
                   <td className="whitespace-nowrap px-6 py-4">
                     {artwork.createdBy && (
                       <Link to={`/profile/${artwork.createdBy}`}>
                         <button className="text-blue-500">{artwork.createdBy}</button>
                       </Link>
                     )}
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4">
+                    <button className="text-blue-500">Open</button>
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4">
+                    <button className="text-blue-500">Edit</button>
                   </td>
                 </tr>
               ))}

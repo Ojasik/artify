@@ -8,7 +8,11 @@ const UserCard = ({ userProfile, openEditModal }) => {
   return (
     <div className="flex w-full flex-col items-center gap-4 pt-12 sm:w-80">
       {/* User Icon */}
-      <div className="mb-2 h-40 w-40 rounded-full bg-mainColor"></div>
+      <img
+        src={userProfile.avatar} // Use the avatar URL as the src
+        alt="User Avatar"
+        className="mb-2 h-40 w-40 rounded-full object-cover"
+      />
       <div className="text-center">
         <h1 className="text-2xl font-bold">
           {userProfile.firstname} {userProfile.lastname}

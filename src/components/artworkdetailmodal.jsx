@@ -36,7 +36,34 @@ export const ArtworkDetailsModal = ({ isOpen, onClose, artworkDetails }) => {
                 </div>
 
                 {/* Display about information */}
-                <p className="mt-4">{artworkDetails.about}</p>
+                <div className="mt-4">
+                  {artworkDetails.price && (
+                    <p>
+                      <strong>Price:</strong> ${artworkDetails.price}
+                    </p>
+                  )}
+                  {artworkDetails.category && (
+                    <p>
+                      <strong>Category:</strong> {artworkDetails.category}
+                    </p>
+                  )}
+                  {artworkDetails.description && (
+                    <p>
+                      <strong>Description:</strong> {artworkDetails.description}
+                    </p>
+                  )}
+                  {artworkDetails.createdBy && (
+                    <p>
+                      <strong>Created By:</strong> {artworkDetails.createdBy}
+                    </p>
+                  )}
+                  {artworkDetails.created_at && (
+                    <p>
+                      <strong>Created At:</strong>{' '}
+                      {new Date(artworkDetails.created_at).toLocaleString()}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
             <div className="px-4 py-4 sm:flex sm:flex-row-reverse sm:px-6">

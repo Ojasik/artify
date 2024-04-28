@@ -12,6 +12,10 @@ const cartSchema = new mongoose.Schema({
     ref: 'Artwork',
     required: true,
     unique: true
+  },
+  addedAt: {
+    type: Date,
+    default: Date.now
   }
 });
 

@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const usersRoute = require('./routes/users');
 const artworksRoute = require('./routes/artworks');
 const cartRoute = require('./routes/cart');
+const cron = require('./cron');
 require('dotenv').config();
 
 const password = encodeURIComponent(process.env.DB_PASSWORD);
@@ -23,6 +24,8 @@ mongoose.connect(uri);
 app.use('/api/artworks', artworksRoute);
 app.use('/api/users', usersRoute);
 app.use('/api/cart', cartRoute);
+
+cron();
 
 const PORT = process.env.PORTD;
 app.listen(PORT, () => {

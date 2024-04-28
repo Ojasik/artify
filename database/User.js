@@ -7,7 +7,8 @@ const profileSchema = new mongoose.Schema({
   website: { type: String },
   x: { type: String },
   instagram: { type: String },
-  facebook: { type: String }
+  facebook: { type: String },
+  avatar: { type: String }
 });
 
 // Define user schema

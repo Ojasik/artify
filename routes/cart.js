@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Cart = require('../database/Cart');
+const Artwork = require('../database/Artwork');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
@@ -67,6 +68,17 @@ router.post('/add', authenticateJWT, async (req, res) => {
       return res.status(400).json({ msg: 'Artwork already exists in cart' });
     }
 
+    const artwork = await Artwork.findById(artwork_id);
+
+    // Check if the artwork is available for purchase
+    if (!artwork.isAvailable) {
+      return res.status(400).json({ msg: 'Artwork is not available for purchase' });
+    }
+
+    // Update the availability status of the artwork
+    artwork.isAvailable = false;
+    await artwork.save();
+
     // Create a new cart item
     const cartItem = new Cart({
       user_id: userId,
@@ -79,6 +91,44 @@ router.post('/add', authenticateJWT, async (req, res) => {
     res.json({ msg: 'Artwork added to cart successfully' });
   } catch (error) {
     console.error('Error adding artwork to cart:', error);
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
+
+router.delete('/:id', authenticateJWT, async (req, res) => {
+  try {
+    const itemId = req.params.id;
+
+    // Check if the cart item exists
+    const cartItem = await Cart.findById(itemId);
+    if (!cartItem) {
+      return res.status(404).json({ msg: 'Cart item not found' });
+    }
+
+    console.log('CartItem User ID:', cartItem.user_id);
+    console.log('Request User ID:', req.userId);
+
+    // Check if the cart item belongs to the logged-in user
+    if (req.userId !== cartItem.user_id.toString()) {
+      return res.status(403).json({ msg: 'Forbidden' });
+    }
+
+    // Find the artwork associated with the cart item
+    const artwork = await Artwork.findById(cartItem.artwork_id);
+    if (!artwork) {
+      return res.status(404).json({ msg: 'Artwork not found' });
+    }
+
+    // Update the availability status of the artwork
+    artwork.isAvailable = true;
+    await artwork.save();
+
+    // Remove the cart item from the database
+    await cartItem.deleteOne();
+
+    res.json({ msg: 'Artwork removed from cart successfully' });
+  } catch (error) {
+    console.error('Error removing artwork from cart:', error);
     res.status(500).json({ msg: 'Server error' });
   }
 });
