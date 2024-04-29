@@ -1,70 +1,34 @@
-# Getting Started with Create React App
+# Mākslas pārdošanas platforma "Artify"
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Šis projekts ir tīmekļa platforma māksliniekiem, kuru esmu izstrādājis un izveidojis kā savu eksāmena darbu. Projekta mērķis ir izveidot vietni, kur mākslinieki varēs demonstrēt un pārdot savus darbus, bet lietotāji var pārlūkot un iegādāties sev patīkamas mākslas darbus.
 
-## Available Scripts
 
-In the project directory, you can run:
+## Funkcijas
+- Darbu saraksti: Mākslinieki var augšupielādēt darbu attēlus kopā ar aprakstiem un cenu informāciju.
+- Lietotāju autentifikācija: Droša lietotāju autentifikācijas sistēma, kas ļauj māksliniekiem un pircējiem piekļūt saviem kontiem.
+- Iepirkumu grozs: Pircēji var pievienot darbus savam iepirkumu grozam un veikt pirkumu.
+- Pasūtījumu pārvaldīšana: Mākslinieki var pārvaldīt pasūtījumus, atjaunināt pasūtījuma statusu un sazināties ar pircējiem.
+- Meklēšana un filtri: Lietotāji var meklēt darbus pēc kategorijas, cenas intervāla un kārtot dilstoši vai augoši.
+- Adaptīvs dizains: Tīmekļa vietne ir optimizēta dažādām ierīcēm, tostarp darba galda datoriem, planšetdatoriem un viedtālruņiem.
 
-### `npm start`
+## Izmantotās tehnoloģijas
+- Frontend: HTML, CSS, JavaScript, React.js
+- Backend: Node.js, Express.js
+- Datu bāze: MongoDB, Mongoose
+- Autentifikācija: JSON Web Tokens (JWT)
+- Maksājumu integrācija: ??????
+- Testēšana: Manuālā testēšana, izmantojot melnas kastes un baltas kastes metodes
+- Versiju kontrole: Git, GitHub
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Instalācija
+1. Klonējiet repozitoriju.
+2. Pārejiet uz projekta direktoriju.
+3. Instalējiet atkarības, izmantojot npm install.
+4. Startējiet front-end daļu, izmantojot npm start.
+5. Startējiet serveri, izmantojot node server vai npm run devStart.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Lietošana
+- Reģistrējieties, lai piekļūtu tirdzniecības platformas funkcijām.
+- Pārlūkojiet darbu sarakstus, pievienojiet vienības grozam un veiciet pirkumu.
+- Mākslinieki var pārvaldīt savus darbu sarakstus un pasūtījumus no savas vadības panelī.
+- Izpētiet dažādas kategorijas un atklājiet jaunus darbus.
