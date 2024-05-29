@@ -1,9 +1,10 @@
-import React from 'react';
-import { Logo } from './logo';
+import React, { useContext } from 'react';
+import { Logo } from '../logo';
 import { UserIcon, LockClosedIcon } from '@heroicons/react/24/solid';
 import { Link, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { UserContext } from '../../contexts/UserContext';
 
 const LoginSchema = Yup.object().shape({
   username: Yup.string().required('Username is required'),
@@ -11,6 +12,7 @@ const LoginSchema = Yup.object().shape({
 });
 export const Login = () => {
   const navigate = useNavigate();
+  const { handleLogin } = useContext(UserContext);
 
   const formik = useFormik({
     initialValues: {
@@ -25,13 +27,15 @@ export const Login = () => {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(values)
+          body: JSON.stringify(values),
+          credentials: 'include'
         });
 
         const data = await response.json();
 
         if (response.ok) {
-          localStorage.setItem('token', data.token);
+          document.cookie = `token=${data.token}; path=/; max-age=3600; SameSite=Lax`;
+          handleLogin();
           navigate('/');
         } else {
           console.error(data.message);

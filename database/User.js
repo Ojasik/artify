@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 
 const profileSchema = new mongoose.Schema({
   // Fields for user profile
-  description: { type: String },
+  description: { type: String, default: '' },
   website: { type: String },
   x: { type: String },
   instagram: { type: String },
@@ -20,10 +20,14 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: {
     type: String,
-    enum: ['regular', 'admin', 'moderator'],
-    default: 'regular'
+    enum: ['Regular', 'Admin', 'Moderator'],
+    default: 'Regular'
   },
   created_at: { type: Date, default: Date.now },
+  status: {
+    type: String,
+    enum: ['Active', 'Inactive']
+  },
   profile: profileSchema
 });
 

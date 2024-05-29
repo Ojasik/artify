@@ -1,0 +1,53 @@
+/* Custom CSS */
+.custom-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: #ebd4ff;
+}
+
+.ant-select-selector:hover,
+.ant-select-selector:focus-within {
+  border: 1px solid #7734e7 !important;
+  box-shadow: 0 0 0 2px rgba(119, 52, 231, 0.2) !important;
+}
+
+.ant-picker:hover,
+.ant-picker-focused {
+  border-color: #7734e7 !important;
+  box-shadow: 0 0 0 2px rgba(119, 52, 231, 0.2) !important;
+}
+
+.ant-picker-cell-selected .ant-picker-cell-inner,
+.ant-picker-cell-range-start .ant-picker-cell-inner,
+.ant-picker-cell-range-end .ant-picker-cell-inner,
+.ant-picker-cell-in-view:hover .ant-picker-cell-inner {
+  background: #7734e7 !important;
+  border-radius: 2px;
+}
+
+/* Custom styles for Ant Design InputNumber */
+.ant-input-number:hover,
+.ant-input-number:focus-within {
+  border-color: #7734e7 !important;
+  box-shadow: 0 0 0 2px rgba(119, 52, 231, 0.2) !important;
+}
+
+.ant-input-number-handler-wrap:hover .ant-input-number-handler-up-inner,
+.ant-input-number-handler-wrap:hover .ant-input-number-handler-down-inner {
+  color: #7734e7 !important;
+}
+
+.ant-input-number-input-wrap input:hover,
+.ant-input-number-input-wrap input:focus {
+  border-color: #7734e7 !important;
+  box-shadow: 0 0 0 2px rgba(119, 52, 231, 0.2) !important;
+}
+
+.ant-input:hover,
+.ant-input:focus {
+  border-color: #7734e7 !important;
+  box-shadow: 0 0 0 2px rgba(119, 52, 231, 0.2) !important;
+}
+
+.ant-picker-range .ant-picker-active-bar {
+  border-color: #7734e7 !important;
+  background: #7734e7 !important;
+}

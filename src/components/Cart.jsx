@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Navbar } from './navbar';
-import ArtworkCard from './ArtworkCard';
+import { Navbar } from './common/Navbar';
+import { ArtworkCard } from './artwork/ArtworkCard';
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -13,9 +13,7 @@ const Cart = () => {
     try {
       // Make a GET request to fetch cart items
       const response = await fetch('http://localhost:8000/api/cart', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -34,9 +32,7 @@ const Cart = () => {
       // Make a DELETE request to remove the artwork from the cart
       const response = await fetch(`http://localhost:8000/api/cart/${itemId}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
+        credentials: 'include'
       });
 
       if (response.ok) {

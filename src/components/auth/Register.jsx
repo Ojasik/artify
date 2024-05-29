@@ -1,7 +1,7 @@
 import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { Logo } from './logo';
+import { Logo } from '../logo';
 import { UserIcon, LockClosedIcon, EnvelopeIcon } from '@heroicons/react/24/solid';
 import { Link, useNavigate } from 'react-router-dom';
 

@@ -1,18 +1,18 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXTwitter, faInstagram, faFacebookF } from '@fortawesome/free-brands-svg-icons';
 import { GlobeAltIcon } from '@heroicons/react/24/outline';
+import { UserContext } from '../../contexts/UserContext';
 import PropTypes from 'prop-types';
 
-const UserCard = ({ userProfile, openEditModal }) => {
+import Avatar from '../common/Avatar';
+export const UserCard = ({ userProfile, openEditModal }) => {
+  const { currentUser } = useContext(UserContext);
+
   return (
     <div className="flex w-full flex-col items-center gap-4 pt-12 sm:w-80">
       {/* User Icon */}
-      <img
-        src={userProfile.avatar} // Use the avatar URL as the src
-        alt="User Avatar"
-        className="mb-2 h-40 w-40 rounded-full object-cover"
-      />
+      <Avatar imageUrl={userProfile.avatar} />
       <div className="text-center">
         <h1 className="text-2xl font-bold">
           {userProfile.firstname} {userProfile.lastname}
@@ -48,11 +48,13 @@ const UserCard = ({ userProfile, openEditModal }) => {
       </div>
       <hr className="w-60" />
       <div className="text-sm">Member since {new Date(userProfile.created_at).toDateString()}</div>
-      <button
-        className="rounded-3xl border border-mainColor px-6 py-2 text-mainColor"
-        onClick={openEditModal}>
-        Edit profile
-      </button>
+      {currentUser === userProfile.username && (
+        <button
+          className="rounded-3xl border border-mainColor px-6 py-2 text-mainColor"
+          onClick={openEditModal}>
+          Edit profile
+        </button>
+      )}
     </div>
   );
 };
@@ -61,5 +63,3 @@ UserCard.propTypes = {
   userProfile: PropTypes.object.isRequired,
   openEditModal: PropTypes.func.isRequired
 };
-
-export default UserCard;

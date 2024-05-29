@@ -1,21 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import logo from '../assets/images/logo.png';
+import React, { useState, useContext } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import logo from '../../assets/images/logo.png';
+import Logout from '../auth/Logout';
+import { UserContext } from '../../contexts/UserContext';
+import { useCategory } from '../../contexts/CategoryContext';
 import PropTypes from 'prop-types';
 import { Disclosure } from '@headlessui/react';
-import {
-  Bars3Icon,
-  XMarkIcon,
-  ShoppingCartIcon,
-  HeartIcon,
-  MagnifyingGlassIcon
-} from '@heroicons/react/24/outline';
-import { Addartworkmodal } from './addartworkmodal';
+import { Bars3Icon, XMarkIcon, ShoppingCartIcon, HeartIcon } from '@heroicons/react/24/outline';
+import { AddArtworkModal } from '../artwork/AddArtworkModal';
 
 // Array with categories buttons (TEST)
 
 const categories = [
-  { name: 'All', href: '#', current: true },
+  { name: 'All', href: '#', current: false },
   { name: 'Painting', href: '#', current: false },
   { name: 'Sculpture', href: '#', current: false },
   { name: 'Literature', href: '#', current: false }
@@ -29,28 +26,30 @@ function classNames(...classes) {
 
 export const Navbar = ({ onArtworkUpdate }) => {
   const [isAddArtworkModalOpen, setIsAddArtworkModalOpen] = useState(false);
+  const { currentUser, role } = useContext(UserContext);
+  const { selectedCategory, setSelectedCategory } = useCategory();
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const openAddArtworkModal = () => {
     setIsAddArtworkModalOpen(true);
   };
 
-  const navigate = useNavigate();
-  const token = localStorage.getItem('token');
-
-  const decodedToken = token ? JSON.parse(atob(token.split('.')[1])) : null;
-  const loggedInUsername = decodedToken ? decodedToken.username : null;
-
-  const handleLogout = () => {
-    // Clear the token on logout
-    localStorage.removeItem('token');
-    navigate('/');
+  const handleCategoryClick = (category) => {
+    if (location.pathname === '/') {
+      setSelectedCategory(category);
+    } else {
+      // If not on the homepage, redirect to the homepage with selected category as query parameter
+      navigate(`/?category=${category}`);
+    }
   };
 
   return (
     <Disclosure>
       {({ open }) => (
         <div className="sticky top-0">
-          <Addartworkmodal
+          <AddArtworkModal
             isOpen={isAddArtworkModalOpen}
             onClose={() => setIsAddArtworkModalOpen(false)}
             onArtworkUpdate={onArtworkUpdate}
@@ -80,9 +79,6 @@ export const Navbar = ({ onArtworkUpdate }) => {
               {/*Another buttons(like, cart, search)*/}
               <div>
                 <div className="flex items-center gap-4 pr-2 sm:hidden">
-                  <button>
-                    <MagnifyingGlassIcon className="h-8 w-8" />
-                  </button>
                   <button
                     type="button"
                     className="rounded-full bg-white text-black hover:text-mainColor focus:outline-none">
@@ -94,17 +90,27 @@ export const Navbar = ({ onArtworkUpdate }) => {
                     <ShoppingCartIcon className="h-8 w-8" />
                   </button>
                 </div>
-                {token ? (
+                {currentUser ? (
                   <div className="hidden space-x-4 sm:block">
                     {/* If logged in, show profile and logout buttons */}
-                    <Link to={`/profile/${loggedInUsername}`}>
+                    {(role === 'Admin' || role === 'Moderator') && (
+                      <>
+                        <Link to="/userregistry">
+                          <button className="p-1 text-black hover:text-mainColor">
+                            User Registry
+                          </button>
+                        </Link>
+                        <Link to="/artworkregistry">
+                          <button className="p-1 text-black hover:text-mainColor">
+                            Artwork Registry
+                          </button>
+                        </Link>
+                      </>
+                    )}
+                    <Link to={`/profile/${currentUser}`}>
                       <button className="p-1 text-black hover:text-mainColor">Profile</button>
                     </Link>
-                    <button
-                      className="rounded-3xl bg-mainColor px-4 py-2 text-white hover:bg-hoverColor"
-                      onClick={handleLogout}>
-                      Logout
-                    </button>
+                    <Logout />
                   </div>
                 ) : (
                   <div className="hidden space-x-4 sm:block">
@@ -134,9 +140,10 @@ export const Navbar = ({ onArtworkUpdate }) => {
                   <a
                     key={item.name}
                     href={item.href}
+                    onClick={() => handleCategoryClick(item.name)}
                     className={classNames(
-                      item.current
-                        ? 'bg-mainColor text-white'
+                      item.current || selectedCategory === item.name
+                        ? 'bg-purple-500 text-white'
                         : 'text-black hover:bg-gray-400 hover:text-white',
                       'rounded-3xl px-3 py-1 font-semibold'
                     )}>
@@ -193,17 +200,13 @@ export const Navbar = ({ onArtworkUpdate }) => {
             <hr />
             {/*Display sign in and join buttons*/}
             <div className="absolute right-0 flex gap-2 p-2">
-              {token ? (
+              {currentUser ? (
                 <div className="space-x-4">
                   {/* If logged in, show profile and logout buttons */}
                   <Link to="/profile">
                     <button className="p-1 text-black hover:text-mainColor">Profile</button>
                   </Link>
-                  <button
-                    className="rounded-3xl bg-mainColor px-4 py-2 text-white hover:bg-hoverColor"
-                    onClick={handleLogout}>
-                    Logout
-                  </button>
+                  <Logout />
                 </div>
               ) : (
                 <div className="space-x-4">

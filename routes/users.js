@@ -6,7 +6,7 @@ const User = require('../database/User');
 require('dotenv').config();
 
 function authenticateJWT(req, res, next) {
-  const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+  const token = req.cookies.token;
 
   if (!token) {
     return res.status(401).json({ message: 'Unauthorized' });
@@ -32,6 +32,15 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'Username or email already exists' });
     }
 
+    const emptyProfile = {
+      description: '',
+      website: '',
+      x: '',
+      instagram: '',
+      facebook: '',
+      avatar: ''
+    };
+
     // Create a new user instance
     const newUser = new User({
       username,
@@ -39,7 +48,9 @@ router.post('/register', async (req, res) => {
       lastname,
       email,
       password,
-      role: 'Regular'
+      role: 'Regular',
+      status: 'Active',
+      profile: emptyProfile
     });
 
     // Save the user to the database
@@ -62,6 +73,10 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid username or password' });
     }
 
+    if (user.status === 'Inactive') {
+      return res.status(403).json({ message: 'User account is inactive' });
+    }
+
     // Check if the password is correct
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
@@ -76,11 +91,23 @@ router.post('/login', async (req, res) => {
       }
     );
 
+    res.cookie('token', token, {
+      httpOnly: true,
+      maxAge: 3600000, // 1 hour expiration
+      sameSite: 'strict'
+      // secure: true,
+    });
+
     res.status(200).json({ message: 'Login successful', token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
+});
+
+router.post('/logout', (req, res) => {
+  res.clearCookie('token');
+  res.status(200).json({ message: 'Logout successful' });
 });
 
 // router.get('/profile', authenticateJWT, async (req, res) => {
@@ -117,7 +144,17 @@ router.post('/login', async (req, res) => {
 //   }
 // });
 
-router.get('/profile/:username', authenticateJWT, async (req, res) => {
+router.get('/get-username', authenticateJWT, async (req, res) => {
+  try {
+    const { username, role } = req.user; // Extract username from the authenticated user object
+    res.status(200).json({ username, role }); // Send the username in the response
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.get('/profile/:username', async (req, res) => {
   try {
     const requestedUsername = req.params.username;
 
@@ -162,17 +199,7 @@ router.get('/profile/:username', authenticateJWT, async (req, res) => {
 router.put('/profile', authenticateJWT, async (req, res) => {
   try {
     const { username } = req.user;
-    const {
-      username: newUsername,
-      description,
-      website,
-      x,
-      instagram,
-      facebook,
-      firstName,
-      lastName,
-      avatar
-    } = req.body;
+    const { description, website, x, instagram, facebook, firstName, lastName, avatar } = req.body;
 
     const updatedProfile = await User.findOneAndUpdate(
       { username },
@@ -180,7 +207,6 @@ router.put('/profile', authenticateJWT, async (req, res) => {
         $set: {
           firstname: firstName,
           lastname: lastName,
-          username: newUsername,
           'profile.description': description,
           'profile.website': website,
           'profile.x': x,
@@ -196,14 +222,7 @@ router.put('/profile', authenticateJWT, async (req, res) => {
       return res.status(404).json({ message: 'User profile not found' });
     }
 
-    const newToken = jwt.sign(
-      { username: newUsername, role: updatedProfile.role },
-      process.env.JWT,
-      {
-        expiresIn: '1h'
-      }
-    );
-    res.status(200).json({ updatedProfile, newToken });
+    res.status(200).json({ updatedProfile });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
@@ -216,6 +235,100 @@ router.get('/', authenticateJWT, async (req, res) => {
     res.status(200).json(users);
   } catch (error) {
     console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.put('/user/:id', authenticateJWT, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      username,
+      firstname,
+      lastname,
+      email,
+      role,
+      facebook,
+      instagram,
+      x,
+      description,
+      website,
+      avatar
+    } = req.body;
+
+    // Find the user by ID
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Update the user's information
+    user.username = username;
+    user.firstname = firstname;
+    user.lastname = lastname;
+    user.email = email;
+    user.role = role;
+    user.profile.facebook = facebook;
+    user.profile.instagram = instagram;
+    user.profile.x = x;
+    user.profile.description = description;
+    user.profile.website = website;
+    user.profile.avatar = avatar;
+
+    // Save the updated user
+    await user.save();
+
+    res.status(200).json({ message: 'User information updated successfully', user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Route to change user's status in user registry
+router.put('/:username/:status', authenticateJWT, async (req, res) => {
+  const { username, status } = req.params;
+
+  try {
+    const user = await User.findOne({ username: username });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.status = status === 'disable' ? 'Inactive' : 'Active';
+
+    await user.save();
+
+    res.status(200).json({
+      message: `User ${status === 'disable' ? 'disabled' : 'enabled'} successfully`,
+      user
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.delete('/:username', async (req, res) => {
+  const username = req.params.username;
+
+  try {
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const result = await User.deleteOne({ username: username });
+
+    if (result.deletedCount === 0) {
+      return res.status(500).json({ message: 'Failed to delete user' });
+    }
+
+    res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting user:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });

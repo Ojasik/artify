@@ -19,12 +19,23 @@ const artworkSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  status: { type: String, enum: ['Uploaded', 'Verified', 'Sold'], default: 'Uploaded' },
+  status: { type: String, enum: ['Uploaded', 'Verified', 'Sold', 'Rejected'], default: 'Uploaded' },
   isAvailable: { type: Boolean, default: true },
   category: {
     type: String,
     enum: ['Painting', 'Sculpture', 'Literature'],
     required: true
+  },
+  commission: {
+    type: Number,
+    default: 0
+  },
+  netEarnings: {
+    type: Number,
+    default: 0
+  },
+  rejectionReason: {
+    type: String
   },
   createdBy: { type: String, required: true },
   createdAt: {

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 const ProfilePagesLinks = ({ profilePages }) => {
   return (
-    <div className="mx-auto flex flex-wrap justify-center gap-4 py-12 sm:mx-0">
+    <div className="mx-auto flex flex-wrap justify-center gap-4 pb-6 pt-12 sm:mx-0">
       {profilePages.map((item) => (
         <a
           key={item.name}

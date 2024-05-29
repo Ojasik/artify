@@ -1,14 +1,14 @@
 import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Dialog } from '@headlessui/react';
+import { CloseOutlined } from '@ant-design/icons';
+import { Modal } from 'antd';
 
-export const Editmodal = ({ isOpen, onClose, onProfileUpdate, initialProfileData }) => {
+export const EditModal = ({ isOpen, onClose, onProfileUpdate, initialProfileData }) => {
   const cancelButtonRef = useRef(null);
   const fileInputRef = useRef(null);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    username: '',
     description: '',
     website: '',
     x: '',
@@ -22,7 +22,6 @@ export const Editmodal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
     setFormData({
       firstName: initialProfileData.firstname || '',
       lastName: initialProfileData.lastname || '',
-      username: initialProfileData.username || '',
       description: initialProfileData.description || '',
       website: initialProfileData.website || '',
       x: initialProfileData.x || '',
@@ -35,7 +34,6 @@ export const Editmodal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    console.log(formData);
   };
 
   const handleFileInputChange = (e) => {
@@ -55,22 +53,15 @@ export const Editmodal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
     try {
       const response = await fetch('http://localhost:8000/api/users/profile', {
         method: 'PUT',
+        credentials: 'include',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
       });
 
       if (response.ok) {
         const responseData = await response.json();
-
-        // Check if the response contains the updated token
-        const newToken = responseData.newToken;
-        if (newToken) {
-          // Update local storage with the new token
-          localStorage.setItem('token', newToken);
-        }
         console.log('Profile updated successfully');
         onProfileUpdate();
         onClose();
@@ -83,162 +74,196 @@ export const Editmodal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
   };
 
   return (
-    <Dialog
+    <Modal
+      title="Edit profile"
       open={isOpen}
-      onClose={onClose}
-      as="div"
-      className="relative z-10"
-      initialFocus={cancelButtonRef}>
-      <div className="fixed inset-0 bg-gray-500 bg-opacity-75" />
+      onCancel={onClose}
+      maskClosable={false}
+      footer={[
+        <button
+          key="cancel"
+          className="mt-3 inline-flex w-full justify-center rounded-full bg-white px-6 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+          onClick={onClose}
+          ref={cancelButtonRef}>
+          Cancel
+        </button>,
+        <button
+          key="save"
+          className="inline-flex w-full justify-center rounded-full bg-mainColor px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-hoverColor sm:ml-3 sm:w-auto"
+          onClick={handleFormSubmit}>
+          Save
+        </button>
+      ]}>
+      <form id="editProfileForm" onSubmit={handleFormSubmit}>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col items-start pb-4">
+            <label htmlFor="firstName" className="block pl-4 text-sm font-medium text-mainColor">
+              First Name
+            </label>
+            <input
+              type="text"
+              id="firstName"
+              name="firstName"
+              placeholder="First Name"
+              value={formData.firstName}
+              onChange={handleInputChange}
+              className="w-full rounded-full border border-black p-2 px-4"
+              required
+            />
+          </div>
+          <div className="flex flex-col items-start pb-4">
+            <label htmlFor="lastName" className="block pl-4 text-sm font-medium text-mainColor">
+              Last Name
+            </label>
+            <input
+              type="text"
+              id="lastName"
+              placeholder="Last Name"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleInputChange}
+              className="w-full rounded-full border border-black p-2 px-4"
+              required
+            />
+          </div>
 
-      <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-        <div className="flex min-h-full items-center justify-center p-4 text-center sm:items-center sm:p-0">
-          <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl sm:my-8 sm:w-full sm:max-w-lg">
-            <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-              <div className="mt-3 text-center sm:mt-0 sm:text-center">
-                <Dialog.Title as="h3" className="pb-3 text-2xl font-semibold text-gray-900">
-                  Edit profile
-                </Dialog.Title>
-                <div className="mt-2">
-                  <form
-                    id="editProfileForm"
-                    className="flex flex-col items-center gap-4"
-                    onSubmit={handleFormSubmit}>
-                    <input
-                      type="text"
-                      name="firstName"
-                      placeholder="First Name"
-                      className="w-80 rounded-full border border-black p-2 px-4"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      required
-                    />
-                    <input
-                      type="text"
-                      name="lastName"
-                      placeholder="Last Name"
-                      className="w-80 rounded-full border border-black p-2 px-4"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      required
-                    />
-                    <input
-                      type="text"
-                      placeholder="Username"
-                      name="username"
-                      className="w-80 rounded-full border border-black p-2 px-4"
-                      value={formData.username}
-                      onChange={handleInputChange}
-                      required
-                    />
-                    <input
-                      type="text"
-                      value={formData.website}
-                      name="website"
-                      className="w-80 rounded-full border border-black p-2 px-4"
-                      onChange={handleInputChange}
-                      placeholder="Website (optional)"
-                    />
-                    <input
-                      type="text"
-                      value={formData.x}
-                      name="x"
-                      className="w-80 rounded-full border border-black p-2 px-4"
-                      onChange={handleInputChange}
-                      placeholder="X (optional)"
-                    />
-                    <input
-                      type="text"
-                      value={formData.instagram}
-                      name="instagram"
-                      className="w-80 rounded-full border border-black p-2 px-4"
-                      onChange={handleInputChange}
-                      placeholder="Instagram (optional)"
-                    />
-                    <input
-                      type="text"
-                      value={formData.facebook}
-                      name="facebook"
-                      className="w-80 rounded-full border border-black p-2 px-4"
-                      onChange={handleInputChange}
-                      placeholder="Facebook (optional)"
-                    />
-                    <textarea
-                      value={formData.description}
-                      name="description"
-                      className="w-80 rounded-2xl border border-black p-2 px-4"
-                      onChange={handleInputChange}
-                      placeholder="Description (optional)"
-                    />
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleFileInputChange}
-                    />
+          <div className="flex flex-col items-start pb-4">
+            <label htmlFor="website" className="block pl-4 text-sm font-medium text-mainColor">
+              Website
+            </label>
+            <input
+              type="text"
+              id="website"
+              name="website"
+              value={formData.website}
+              onChange={handleInputChange}
+              className="w-full rounded-full border border-black p-2 px-4"
+              placeholder="Website (optional)"
+            />
+          </div>
+          <div className="flex flex-col items-start pb-4">
+            <label htmlFor="x" className="block pl-4 text-sm font-medium text-mainColor">
+              X
+            </label>
+            <input
+              type="text"
+              id="x"
+              name="x"
+              value={formData.x}
+              onChange={handleInputChange}
+              className="w-full rounded-full border border-black p-2 px-4"
+              placeholder="X (optional)"
+            />
+          </div>
+          <div className="flex flex-col items-start pb-4">
+            <label htmlFor="instagram" className="block pl-4 text-sm font-medium text-mainColor">
+              Instagram
+            </label>
+            <input
+              type="text"
+              id="instagram"
+              name="instagram"
+              value={formData.instagram}
+              onChange={handleInputChange}
+              className="w-full rounded-full border border-black p-2 px-4"
+              placeholder="Instagram (optional)"
+            />
+          </div>
+          <div className="flex flex-col items-start pb-4">
+            <label htmlFor="facebook" className="block pl-4 text-sm font-medium text-mainColor">
+              Facebook
+            </label>
+            <input
+              type="text"
+              id="facebook"
+              name="facebook"
+              value={formData.facebook}
+              onChange={handleInputChange}
+              className="w-full rounded-full border border-black p-2 px-4"
+              placeholder="Facebook (optional)"
+            />
+          </div>
+          <div className="col-span-2 flex flex-col items-start pb-4">
+            <label htmlFor="description" className="block pl-4 text-sm font-medium text-mainColor">
+              Description
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              className="w-full rounded-2xl border border-black p-2 px-4"
+              placeholder="Description (optional)"
+            />
+          </div>
+          <div className="col-span-2">
+            <div className="flex flex-col items-center justify-center">
+              {formData.avatar && (
+                <span className="h-36 w-36 overflow-hidden rounded-full bg-gray-200">
+                  <img
+                    src={formData.avatar}
+                    alt="Profile Icon"
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="mt-2 flex items-center">
                     <button
                       type="button"
-                      className="cursor-pointer"
+                      className="inline-flex justify-center rounded-full bg-mainColor px-6 py-1 text-sm font-semibold text-white shadow-sm hover:bg-hoverColor sm:w-auto"
                       onClick={() => fileInputRef.current.click()}>
-                      {formData.avatar ? (
-                        <img
-                          src={formData.avatar}
-                          alt="Profile Icon"
-                          className="h-24 w-24 rounded-full"
-                        />
-                      ) : (
-                        <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gray-200">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            className="h-12 w-12 text-gray-400">
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                            />
-                          </svg>
-                        </div>
-                      )}
+                      Upload Image
                     </button>
-                  </form>
-                </div>
+                    {formData.avatar && (
+                      <button
+                        type="button"
+                        className="ml-2 inline-flex items-center justify-center rounded-full bg-red-500 px-2 py-1 text-sm font-semibold text-white shadow-sm hover:bg-red-600"
+                        style={{ width: '28px', height: '28px' }}
+                        onClick={() => setFormData({ ...formData, avatar: '' })}>
+                        <CloseOutlined style={{ fontSize: '16px' }} />{' '}
+                      </button>
+                    )}
+                  </div>
+                </span>
+              )}
+              <div className="mt-2 flex items-center">
+                <button
+                  type="button"
+                  className="inline-flex justify-center rounded-full bg-mainColor px-6 py-1 text-sm font-semibold text-white shadow-sm hover:bg-hoverColor sm:w-auto"
+                  onClick={() => fileInputRef.current.click()}>
+                  Upload Image
+                </button>
+                {formData.avatar && (
+                  <button
+                    type="button"
+                    className="ml-2 inline-flex items-center justify-center rounded-full bg-red-500 px-2 py-1 text-sm font-semibold text-white shadow-sm hover:bg-red-600"
+                    style={{ width: '28px', height: '28px' }}
+                    onClick={() => setFormData({ ...formData, avatar: '' })}>
+                    <CloseOutlined style={{ fontSize: '16px' }} />
+                  </button>
+                )}
               </div>
-            </div>
-            <div className="px-4 py-4 sm:flex sm:flex-row-reverse sm:px-6">
-              <button
-                type="submit"
-                className="inline-flex w-full justify-center rounded-full bg-mainColor px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-hoverColor sm:ml-3 sm:w-auto"
-                form="editProfileForm">
-                Save
-              </button>
-              <button
-                type="button"
-                className="mt-3 inline-flex w-full justify-center rounded-full bg-white px-6 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                onClick={onClose}
-                ref={cancelButtonRef}>
-                Cancel
-              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                id="avatar"
+                className="hidden"
+                onChange={handleFileInputChange}
+              />
             </div>
           </div>
         </div>
-      </div>
-    </Dialog>
+      </form>
+    </Modal>
   );
 };
 
-Editmodal.propTypes = {
+EditModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onProfileUpdate: PropTypes.func.isRequired,
   initialProfileData: PropTypes.shape({
     firstname: PropTypes.string,
     lastname: PropTypes.string,
-    username: PropTypes.string,
     description: PropTypes.string,
     website: PropTypes.string,
     x: PropTypes.string,
