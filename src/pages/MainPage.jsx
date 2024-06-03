@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Navbar } from '../components/common/Navbar';
 import { ArtworkDetailModal } from '../components/artwork/ArtworkDetailModal';
 import { ArtworkCard } from '../components/artwork/ArtworkCard';
 import { useCategory } from '../contexts/CategoryContext';
 import { useLocation } from 'react-router-dom';
+import { UserContext } from '../contexts/UserContext';
 
 export const MainPage = () => {
+  const { currentUser } = useContext(UserContext);
   const [artworks, setArtworks] = useState([]);
   const [selectedArtworkDetails, setSelectedArtworkDetails] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -79,8 +81,10 @@ export const MainPage = () => {
 
   const filteredArtworks =
     selectedCategory === 'All'
-      ? artworks
-      : artworks.filter((artwork) => artwork.category === selectedCategory);
+      ? artworks.filter((artwork) => artwork.createdBy !== currentUser)
+      : artworks.filter(
+          (artwork) => artwork.category === selectedCategory && artwork.createdBy !== currentUser
+        );
 
   return (
     <>

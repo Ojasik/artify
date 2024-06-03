@@ -4,7 +4,15 @@ import PropTypes from 'prop-types';
 const UserContext = createContext();
 
 const UserProvider = ({ children }) => {
-  const [userData, setUserData] = useState({ username: '', role: '' });
+  const [userData, setUserData] = useState({
+    username: '',
+    role: '',
+    userId: '',
+    firstname: '',
+    lastname: '',
+    phone: '',
+    email: ''
+  });
 
   const fetchCurrentUser = async () => {
     try {
@@ -31,12 +39,30 @@ const UserProvider = ({ children }) => {
   };
 
   const Logout = () => {
-    setUserData({ username: '', role: '' });
+    setUserData({
+      username: '',
+      role: '',
+      userId: '',
+      firstname: '',
+      lastname: '',
+      phone: '',
+      email: ''
+    });
   };
 
   return (
     <UserContext.Provider
-      value={{ currentUser: userData.username, role: userData.role, handleLogin, Logout }}>
+      value={{
+        currentUser: userData.username,
+        role: userData.role,
+        userId: userData.userId,
+        firstname: userData.firstname,
+        lastname: userData.lastname,
+        phone: userData.phone,
+        email: userData.email,
+        handleLogin,
+        Logout
+      }}>
       {children}
     </UserContext.Provider>
   );

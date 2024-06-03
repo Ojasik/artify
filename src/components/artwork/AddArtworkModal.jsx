@@ -25,7 +25,25 @@ const validationSchema = yup.object({
   images: yup
     .array()
     .test('atLeastOneImage', 'At least one image is required', (images) => images.length > 0)
-    .max(5, 'You can upload a maximum of 5 images')
+    .max(5, 'You can upload a maximum of 5 images'),
+  weight: yup
+    .number()
+    .min(0, 'Weight must be greater than or equal to 0')
+    .required('Weight is required'),
+  size: yup.object({
+    length: yup
+      .number()
+      .min(0, 'Length must be greater than or equal to 0')
+      .required('Length is required'),
+    width: yup
+      .number()
+      .min(0, 'Width must be greater than or equal to 0')
+      .required('Width is required'),
+    height: yup
+      .number()
+      .min(0, 'Height must be greater than or equal to 0')
+      .required('Height is required')
+  })
 });
 
 export const AddArtworkModal = ({ isOpen, onClose, onArtworkUpdate }) => {
@@ -37,7 +55,13 @@ export const AddArtworkModal = ({ isOpen, onClose, onArtworkUpdate }) => {
       price: '',
       about: '',
       category: 'Painting',
-      images: []
+      images: [],
+      weight: '',
+      size: {
+        length: '',
+        width: '',
+        height: ''
+      }
     },
     validationSchema: validationSchema,
     onSubmit: async (values, { resetForm }) => {
@@ -54,7 +78,11 @@ export const AddArtworkModal = ({ isOpen, onClose, onArtworkUpdate }) => {
         formDataToSend.append('category', values.category);
         formDataToSend.append('commission', commission);
         formDataToSend.append('netEarnings', netEarnings);
-
+        formDataToSend.append('weight', values.weight);
+        formDataToSend.append('size[length]', values.size.length);
+        formDataToSend.append('size[width]', values.size.width);
+        formDataToSend.append('size[height]', values.size.height);
+        console.log(formDataToSend);
         images.forEach((image) => {
           formDataToSend.append('images', image.file);
         });
@@ -227,6 +255,70 @@ export const AddArtworkModal = ({ isOpen, onClose, onArtworkUpdate }) => {
           onBlur={formik.handleBlur}
           required
         />
+        <input
+          type="number"
+          placeholder="Weight (kg)"
+          name="weight"
+          className={`w-80 rounded-full border border-black p-2 px-4 ${
+            formik.touched.weight && formik.errors.weight ? 'border-red-500' : 'border-black'
+          }`}
+          value={formik.values.weight}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          required
+        />
+        {formik.touched.weight && formik.errors.weight ? (
+          <div className="text-red-500">{formik.errors.weight}</div>
+        ) : null}
+
+        <div className="flex w-4/5 gap-4">
+          <input
+            type="number"
+            placeholder="Length (cm)"
+            name="size.length"
+            className={`w-1/3 rounded-full border border-black p-2 px-4 ${
+              formik.touched.size?.length && formik.errors.size?.length
+                ? 'border-red-500'
+                : 'border-black'
+            }`}
+            value={formik.values.size.length}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            required
+          />
+          <input
+            type="number"
+            placeholder="Width (cm)"
+            name="size.width"
+            className={`w-1/3 rounded-full border border-black p-2 px-4 ${
+              formik.touched.size?.width && formik.errors.size?.width
+                ? 'border-red-500'
+                : 'border-black'
+            }`}
+            value={formik.values.size.width}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            required
+          />
+          <input
+            type="number"
+            placeholder="Height (cm)"
+            name="size.height"
+            className={`w-1/3 rounded-full border border-black p-2 px-4 ${
+              formik.touched.size?.height && formik.errors.size?.height
+                ? 'border-red-500'
+                : 'border-black'
+            }`}
+            value={formik.values.size.height}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            required
+          />
+        </div>
+        {formik.touched.size &&
+        (formik.errors.size?.length || formik.errors.size?.width || formik.errors.size?.height) ? (
+          <div className="text-red-500">Please enter valid dimensions</div>
+        ) : null}
 
         <label className="inline-flex w-full cursor-pointer justify-center rounded-full bg-mainColor px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-hoverColor sm:ml-3 sm:w-auto">
           Upload Images

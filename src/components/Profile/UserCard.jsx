@@ -1,13 +1,21 @@
-import React, { useContext } from 'react';
+import React, { useState, useContext } from 'react';
+import { SettingOutlined, CarOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXTwitter, faInstagram, faFacebookF } from '@fortawesome/free-brands-svg-icons';
 import { GlobeAltIcon } from '@heroicons/react/24/outline';
 import { UserContext } from '../../contexts/UserContext';
+import AddressEditModal from './AddressEditModal';
 import PropTypes from 'prop-types';
 
 import Avatar from '../common/Avatar';
 export const UserCard = ({ userProfile, openEditModal }) => {
   const { currentUser } = useContext(UserContext);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+
+  const openAddressModal = () => {
+    setIsAddressModalOpen(true);
+  };
 
   return (
     <div className="flex w-full flex-col items-center gap-4 pt-12 sm:w-80">
@@ -49,12 +57,17 @@ export const UserCard = ({ userProfile, openEditModal }) => {
       <hr className="w-60" />
       <div className="text-sm">Member since {new Date(userProfile.created_at).toDateString()}</div>
       {currentUser === userProfile.username && (
-        <button
-          className="rounded-3xl border border-mainColor px-6 py-2 text-mainColor"
-          onClick={openEditModal}>
-          Edit profile
-        </button>
+        <div className="flex gap-4">
+          <CarOutlined onClick={openAddressModal} />
+          <button
+            className="rounded-3xl border border-mainColor px-6 py-2 text-mainColor"
+            onClick={openEditModal}>
+            Edit profile
+          </button>
+          <SettingOutlined />
+        </div>
       )}
+      <AddressEditModal isOpen={isAddressModalOpen} onClose={() => setIsAddressModalOpen(false)} />
     </div>
   );
 };

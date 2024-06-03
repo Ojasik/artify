@@ -11,6 +11,7 @@ export const UserEditModal = ({ isOpen, onClose, rowData, onUpdateSuccess }) => 
     firstname: rowData.firstname,
     lastname: rowData.lastname,
     email: rowData.email,
+    phone: rowData.phone,
     description: rowData.profile.description,
     website: rowData.profile.website,
     x: rowData.profile.x,
@@ -121,6 +122,15 @@ export const UserEditModal = ({ isOpen, onClose, rowData, onUpdateSuccess }) => 
                       placeholder="email"
                       className="w-80 rounded-full border border-black p-2 px-4"
                       value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                    />
+                    <input
+                      type="text"
+                      name="phone"
+                      placeholder="phone"
+                      className="w-80 rounded-full border border-black p-2 px-4"
+                      value={formData.phone}
                       onChange={handleInputChange}
                       required
                     />

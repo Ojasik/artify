@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Modal, Image } from 'antd';
 import { UserContext } from '../../contexts/UserContext';
 import RejectionDrawer from '../RejectionDrawer';
+import moment from 'moment';
 
 const getImageContainerClass = (numImages) => {
   if (numImages === 2) {
@@ -76,31 +77,43 @@ export const ArtworkDetailModal = ({
         onCancel={onClose}
         width={1000}
         footer={[
-          <button
-            key="close"
-            className="mr-3 inline-flex w-full justify-center rounded-full bg-mainColor px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-hoverColor sm:ml-3 sm:w-auto"
-            onClick={onClose}>
-            Close
-          </button>,
-          (role === 'Moderator' || role === 'Admin') &&
-            (artworkDetails.status === 'Uploaded' || artworkDetails.status === 'Verified') && (
-              <>
-                <button
-                  key="reject"
-                  className="inline-flex w-full justify-center rounded-full bg-red-500 px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 sm:w-auto"
-                  onClick={handleReject}>
-                  Reject
-                </button>
-                {artworkDetails.status !== 'Verified' && (
-                  <button
-                    key="verify"
-                    className="inline-flex w-full justify-center rounded-full bg-green-500 px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-700 sm:ml-3 sm:w-auto"
-                    onClick={handleVerify}>
-                    Verify
-                  </button>
+          <div className="flex items-center justify-between" key="footer-content">
+            {artworkDetails.createdBy && (
+              <p className="mr-4 mt-3 text-base">
+                <span className="text-base font-semibold">Created By:</span>{' '}
+                {artworkDetails.createdBy}{' '}
+                {moment(artworkDetails.createdAt).format('DD.MM.YYYY HH:mm')}
+              </p>
+            )}
+
+            <div>
+              <button
+                key="close"
+                className="mr-3 inline-flex justify-center rounded-full bg-mainColor px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-hoverColor sm:ml-3 sm:w-auto"
+                onClick={onClose}>
+                Close
+              </button>
+              {(role === 'Moderator' || role === 'Admin') &&
+                (artworkDetails.status === 'Uploaded' || artworkDetails.status === 'Verified') && (
+                  <>
+                    <button
+                      key="reject"
+                      className="inline-flex justify-center rounded-full bg-red-500 px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 sm:w-auto"
+                      onClick={handleReject}>
+                      Reject
+                    </button>
+                    {artworkDetails.status !== 'Verified' && (
+                      <button
+                        key="verify"
+                        className="inline-flex justify-center rounded-full bg-green-500 px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-700 sm:ml-3 sm:w-auto"
+                        onClick={handleVerify}>
+                        Verify
+                      </button>
+                    )}
+                  </>
                 )}
-              </>
-            )
+            </div>
+          </div>
         ]}
         destroyOnClose
         title="Artwork Details">
@@ -163,18 +176,6 @@ export const ArtworkDetailModal = ({
                 <span className="text-lg font-semibold">Category:</span> {artworkDetails.category}
               </p>
             )}
-            {artworkDetails.createdBy && (
-              <p>
-                <span className="text-lg font-semibold">Created By:</span>{' '}
-                {artworkDetails.createdBy}
-              </p>
-            )}
-            {artworkDetails.createdAt && (
-              <p>
-                <span className="text-lg font-semibold">Created At:</span>{' '}
-                {artworkDetails.createdAt}
-              </p>
-            )}
           </div>
         </div>
       </Modal>
@@ -193,6 +194,6 @@ ArtworkDetailModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   artworkDetails: PropTypes.object.isRequired,
-  setArtworkDetails: PropTypes.func.isRequired,
-  onUpdate: PropTypes.func.isRequired
+  setArtworkDetails: PropTypes.func,
+  onUpdate: PropTypes.func
 };

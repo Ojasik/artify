@@ -60,8 +60,8 @@ RejectionDrawer.propTypes = {
   visible: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   artworkDetails: PropTypes.object.isRequired,
-  onUpdate: PropTypes.func.isRequired,
-  setArtworkDetails: PropTypes.func.isRequired
+  onUpdate: PropTypes.func,
+  setArtworkDetails: PropTypes.func
 };
 
 export default RejectionDrawer;

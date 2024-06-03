@@ -65,6 +65,7 @@ export const UserRegistry = () => {
     { headerName: 'First Name', field: 'firstname', sortable: true, filter: true, flex: 1 },
     { headerName: 'Last Name', field: 'lastname', sortable: true, filter: true, flex: 1 },
     { headerName: 'Email', field: 'email', sortable: true, filter: true, flex: 1 },
+    { headerName: 'Phone', field: 'phone', sortable: true, filter: true, flex: 1 },
     {
       headerName: 'Description',
       field: 'profile.description',

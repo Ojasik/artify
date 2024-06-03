@@ -5,6 +5,24 @@ const imageSchema = new mongoose.Schema({
   contentType: String
 });
 
+const sizeSchema = new mongoose.Schema({
+  length: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  width: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  height: {
+    type: Number,
+    required: true,
+    min: 0
+  }
+});
+
 const artworkSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -36,6 +54,15 @@ const artworkSchema = new mongoose.Schema({
   },
   rejectionReason: {
     type: String
+  },
+  weight: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  size: {
+    type: sizeSchema,
+    required: true
   },
   createdBy: { type: String, required: true },
   createdAt: {

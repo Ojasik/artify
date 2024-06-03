@@ -13,6 +13,7 @@ const validationSchema = Yup.object({
   lastname: Yup.string()
     .matches(/^[^\d]+$/, 'No numbers allowed')
     .required('Last name is required'),
+  phone: Yup.string().required('Phone is required'),
   email: Yup.string()
     .email('Invalid email address')
     .required('Email is required')
@@ -35,6 +36,7 @@ export const Register = () => {
       firstname: '',
       lastname: '',
       email: '',
+      phone: '',
       password: ''
     },
     validationSchema,
@@ -144,6 +146,24 @@ export const Register = () => {
               />
               {formik.touched.email && formik.errors.email && (
                 <div className="text-red-500">{formik.errors.email}</div>
+              )}
+            </div>
+
+            <div className="relative">
+              <EnvelopeIcon className="absolute right-4 top-2.5 h-5" />
+              <input
+                type="text"
+                className={`w-80 rounded-full border p-2 px-4 ${
+                  formik.touched.phone && formik.errors.phone ? 'border-red-500' : 'border-black'
+                }`}
+                placeholder="Phone"
+                name="phone"
+                value={formik.values.phone}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+              {formik.touched.phone && formik.errors.phone && (
+                <div className="text-red-500">{formik.errors.phone}</div>
               )}
             </div>
 

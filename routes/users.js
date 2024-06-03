@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../database/User');
+const Address = require('../database/Address');
 require('dotenv').config();
 
 function authenticateJWT(req, res, next) {
@@ -24,7 +25,7 @@ function authenticateJWT(req, res, next) {
 
 router.post('/register', async (req, res) => {
   try {
-    const { username, firstname, lastname, email, password } = req.body;
+    const { username, firstname, lastname, email, phone, password } = req.body;
 
     // Check if the username or email already exists
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
@@ -47,6 +48,7 @@ router.post('/register', async (req, res) => {
       firstname,
       lastname,
       email,
+      phone,
       password,
       role: 'Regular',
       status: 'Active',
@@ -84,7 +86,15 @@ router.post('/login', async (req, res) => {
     }
 
     const token = jwt.sign(
-      { userId: user._id, username: user.username, role: user.role },
+      {
+        userId: user._id,
+        username: user.username,
+        role: user.role,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        phone: user.phone,
+        email: user.email
+      },
       process.env.JWT,
       {
         expiresIn: '1h' // Token expires in 1 hour
@@ -110,44 +120,10 @@ router.post('/logout', (req, res) => {
   res.status(200).json({ message: 'Logout successful' });
 });
 
-// router.get('/profile', authenticateJWT, async (req, res) => {
-//   try {
-//     const { username } = req.user;
-
-//     // Fetch user profile information from the database
-//     const userProfile = await User.findOne({ username }, { password: 0 }); // Exclude password field
-//     if (!userProfile) {
-//       return res.status(404).json({ message: 'User profile not found' });
-//     }
-
-//     // Destructure user profile data
-//     const { firstname, lastname, profile, created_at } = userProfile;
-
-//     // Extract additional profile information
-//     const { description = '', website = '', x = '', instagram = '', facebook = '' } = profile || {};
-
-//     // Return the desired information
-//     res.status(200).json({
-//       username,
-//       firstname,
-//       lastname,
-//       description,
-//       website,
-//       x,
-//       instagram,
-//       facebook,
-//       created_at
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Internal server error' });
-//   }
-// });
-
 router.get('/get-username', authenticateJWT, async (req, res) => {
   try {
-    const { username, role } = req.user; // Extract username from the authenticated user object
-    res.status(200).json({ username, role }); // Send the username in the response
+    const { username, role, userId, firstname, lastname, phone, email } = req.user; // Extract username from the authenticated user object
+    res.status(200).json({ username, role, userId, firstname, lastname, phone, email }); // Send the username in the response
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
@@ -247,6 +223,7 @@ router.put('/user/:id', authenticateJWT, async (req, res) => {
       firstname,
       lastname,
       email,
+      phone,
       role,
       facebook,
       instagram,
@@ -267,6 +244,7 @@ router.put('/user/:id', authenticateJWT, async (req, res) => {
     user.firstname = firstname;
     user.lastname = lastname;
     user.email = email;
+    user.phone = phone;
     user.role = role;
     user.profile.facebook = facebook;
     user.profile.instagram = instagram;
@@ -330,6 +308,35 @@ router.delete('/:username', async (req, res) => {
   } catch (error) {
     console.error('Error deleting user:', error);
     res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.post('/add-address', async (req, res) => {
+  try {
+    const { userId, ...addressData } = req.body;
+    const existingAddress = await Address.findOneAndUpdate(
+      { user: userId },
+      addressData,
+      { new: true, upsert: true } // Create a new address if it doesn't exist
+    );
+    res.json(existingAddress);
+  } catch (error) {
+    console.error('Error updating address:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.get('/:userId/address', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const address = await Address.findOne({ user: userId });
+    if (!address) {
+      return res.status(404).json({ message: 'Address not found' });
+    }
+    res.json(address);
+  } catch (error) {
+    console.error('Error fetching address:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

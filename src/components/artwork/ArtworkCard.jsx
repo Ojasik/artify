@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Popconfirm } from 'antd';
 import {
   EditOutlined,
@@ -33,6 +34,12 @@ export const ArtworkCard = ({
   const { currentUser } = useContext(UserContext);
   const handleAddToCart = () => {
     addToCart(artwork._id); // Call the addToCart function with artwork ID as parameter
+  };
+
+  const navigate = useNavigate();
+
+  const handleBuyNow = () => {
+    navigate(`/order/${artwork._id}`, { state: { artwork } });
   };
 
   return (
@@ -95,7 +102,9 @@ export const ArtworkCard = ({
           )}
         </div>
         {currentUser !== artwork.createdBy && (
-          <button className="mt-2 w-full rounded-full bg-mainColor py-2 text-xl font-bold text-white transition-colors duration-300 hover:bg-hoverColor">
+          <button
+            onClick={handleBuyNow}
+            className="mt-2 w-full rounded-full bg-mainColor py-2 text-xl font-bold text-white transition-colors duration-300 hover:bg-hoverColor">
             Buy Now
           </button>
         )}

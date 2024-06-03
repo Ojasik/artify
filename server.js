@@ -6,6 +6,8 @@ const bodyParser = require('body-parser');
 const usersRoute = require('./routes/users');
 const artworksRoute = require('./routes/artworks');
 const cartRoute = require('./routes/cart');
+const shippingRateRoute = require('./routes/shippingrates');
+const ordersRoute = require('./routes/orders');
 const cron = require('./cron');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
@@ -30,6 +32,8 @@ mongoose.connect(uri);
 app.use('/api/artworks', artworksRoute);
 app.use('/api/users', usersRoute);
 app.use('/api/cart', cartRoute);
+app.use('/api/shippingrates', shippingRateRoute);
+app.use('/api/orders', ordersRoute);
 
 cron();
 
