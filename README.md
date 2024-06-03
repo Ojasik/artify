@@ -16,7 +16,7 @@
 - Backend: Node.js, Express.js
 - Datu bāze: MongoDB, Mongoose
 - Autentifikācija: JSON Web Tokens (JWT)
-- Maksājumu integrācija: ??????
+- Maksājumu integrācija: Stripe
 - Testēšana: Manuālā testēšana, izmantojot melnas kastes un baltas kastes metodes
 - Versiju kontrole: Git, GitHub
 
