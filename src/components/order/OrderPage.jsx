@@ -34,11 +34,16 @@ const OrderPage = () => {
   const [shippingCost, setShippingCost] = useState(0);
   const [paymentError, setPaymentError] = useState(null);
   const [paymentLoading, setPaymentLoading] = useState(false);
+  const [formData, setFormData] = useState({});
   const stripe = useStripe();
   const elements = useElements();
 
   const handleShippingCostChange = (cost) => {
     setShippingCost(cost);
+  };
+
+  const handleFormDataChange = (data) => {
+    setFormData(data);
   };
 
   const handleSubmitPayment = async (event) => {
@@ -93,6 +98,8 @@ const OrderPage = () => {
           throw new Error(confirmError.message);
         }
 
+        await saveOrder(paymentIntent.id);
+
         navigate('/');
         message.success('Payment successful! Redirecting to the main page.');
       } catch (error) {
@@ -104,13 +111,50 @@ const OrderPage = () => {
     }
   };
 
+  const saveOrder = async (paymentIntentId) => {
+    try {
+      const orderData = {
+        artworks: [artwork._id],
+        totalPrice: artwork.price + shippingCost,
+        shippingCost,
+        country: formData.country,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        address: formData.address,
+        apartment: formData.apartment,
+        city: formData.city,
+        postalCode: formData.postalCode,
+        phone: formData.phone,
+        email: formData.email
+      };
+
+      const response = await fetch('http://localhost:8000/api/orders/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify(orderData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save order');
+      }
+
+      console.log('Order saved successfully');
+    } catch (error) {
+      console.error('Error saving order:', error);
+    }
+  };
+
   return (
     <div className="flex justify-center p-4">
       <div className="flex w-full max-w-5xl">
         <div className="w-2/3 p-4">
           <ShippingAddressForm
-            artworkWeight={artwork.weight}
+            artwork={artwork}
             onShippingCostChange={handleShippingCostChange}
+            onFormDataChange={handleFormDataChange}
           />
           <div className="mt-6 rounded-lg bg-white p-6 shadow-md">
             <h2 className="mb-4 text-2xl font-semibold">Card Payment Details</h2>

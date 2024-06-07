@@ -8,6 +8,7 @@ import { CategoryProvider } from './contexts/CategoryContext';
 import { UserRegistry } from './pages/UserRegistry';
 import { ArtworkRegistry } from './pages/ArtworkRegistry';
 import OrderPage from './components/order/OrderPage';
+import { OrderRegistry } from './pages/OrderRegistry';
 
 import Cart from './components/Cart';
 function App() {
@@ -22,6 +23,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/userregistry" element={<UserRegistry />} />
               <Route path="/artworkregistry" element={<ArtworkRegistry />} />
+              <Route path="/orderregistry" element={<OrderRegistry />} />
               <Route path="/register" element={<Register />} />
               <Route path="/order/:id" element={<OrderPage />} />
               <Route path="/cart" element={<Cart />} />

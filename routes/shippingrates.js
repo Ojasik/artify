@@ -15,14 +15,18 @@ router.get('/', async (req, res) => {
 
 router.post('/calculate-shipping', async (req, res) => {
   try {
-    const { country, weight } = req.body;
+    const { country, weight, height, width, length } = req.body;
+
+    // Convert dimensions to meters
+    const volume = height * 0.01 * (width * 0.01) * (length * 0.01);
 
     const shippingRate = await ShippingRate.findOne({ country });
     if (!shippingRate) {
       return res.status(404).json({ message: 'Shipping rate not found for this country' });
     }
 
-    const shippingCost = shippingRate.baseRate + shippingRate.perKg * weight;
+    let shippingCost = shippingRate.baseRate + shippingRate.perKg * weight;
+    shippingCost += shippingRate.perCubicUnit * volume;
 
     res.json({ shippingCost });
   } catch (error) {

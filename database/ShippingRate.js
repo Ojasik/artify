@@ -13,6 +13,10 @@ const ShippingRateSchema = new mongoose.Schema({
   perKg: {
     type: Number,
     required: true
+  },
+  perCubicUnit: {
+    type: Number,
+    required: true
   }
 });
 

@@ -6,15 +6,47 @@ import { GlobeAltIcon } from '@heroicons/react/24/outline';
 import { UserContext } from '../../contexts/UserContext';
 import AddressEditModal from './AddressEditModal';
 import PropTypes from 'prop-types';
+import BankDetailsModal from './BankDetailsModal';
 
 import Avatar from '../common/Avatar';
 export const UserCard = ({ userProfile, openEditModal }) => {
   const { currentUser } = useContext(UserContext);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [isBankModalOpen, setIsBankModalOpen] = useState(false);
 
   const openAddressModal = () => {
     setIsAddressModalOpen(true);
+  };
+
+  const openBankModal = () => {
+    setIsBankModalOpen(true);
+  };
+
+  // Really this data are not used, in backend there are data for testing provided by Stripe
+  const handleBankDetailsSubmit = async (bankDetails) => {
+    try {
+      console.log(bankDetails);
+      // Send a POST request to your backend API to save the bank details
+      const response = await fetch('http://localhost:8000/api/orders/create-connect-account', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json' // Set Content-Type header
+        },
+        body: JSON.stringify(bankDetails) // Send the bank details in the request body
+      });
+
+      if (response.ok) {
+        console.log('Bank details saved successfully');
+
+        setIsBankModalOpen(false);
+      } else {
+        console.error('Failed to save bank details:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error saving bank details:', error);
+    }
   };
 
   return (
@@ -64,10 +96,15 @@ export const UserCard = ({ userProfile, openEditModal }) => {
             onClick={openEditModal}>
             Edit profile
           </button>
-          <SettingOutlined />
+          <SettingOutlined onClick={openBankModal} />
         </div>
       )}
       <AddressEditModal isOpen={isAddressModalOpen} onClose={() => setIsAddressModalOpen(false)} />
+      <BankDetailsModal
+        isOpen={isBankModalOpen}
+        onClose={() => setIsBankModalOpen(false)}
+        onBankDetailsSubmit={handleBankDetailsSubmit}
+      />
     </div>
   );
 };

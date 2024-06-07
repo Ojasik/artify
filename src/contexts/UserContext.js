@@ -34,6 +34,10 @@ const UserProvider = ({ children }) => {
     fetchCurrentUser();
   }, []);
 
+  const updateCurrentUser = (newUserData) => {
+    setUserData(newUserData);
+  };
+
   const handleLogin = () => {
     fetchCurrentUser();
   };
@@ -61,6 +65,7 @@ const UserProvider = ({ children }) => {
         phone: userData.phone,
         email: userData.email,
         handleLogin,
+        updateCurrentUser,
         Logout
       }}>
       {children}

@@ -276,7 +276,7 @@ export const AddArtworkModal = ({ isOpen, onClose, onArtworkUpdate }) => {
             type="number"
             placeholder="Length (cm)"
             name="size.length"
-            className={`w-1/3 rounded-full border border-black p-2 px-4 ${
+            className={`w-1/3 rounded-full border border-black p-2 px-3 ${
               formik.touched.size?.length && formik.errors.size?.length
                 ? 'border-red-500'
                 : 'border-black'
@@ -290,7 +290,7 @@ export const AddArtworkModal = ({ isOpen, onClose, onArtworkUpdate }) => {
             type="number"
             placeholder="Width (cm)"
             name="size.width"
-            className={`w-1/3 rounded-full border border-black p-2 px-4 ${
+            className={`w-1/3 rounded-full border border-black p-2 px-3 ${
               formik.touched.size?.width && formik.errors.size?.width
                 ? 'border-red-500'
                 : 'border-black'
@@ -304,7 +304,7 @@ export const AddArtworkModal = ({ isOpen, onClose, onArtworkUpdate }) => {
             type="number"
             placeholder="Height (cm)"
             name="size.height"
-            className={`w-1/3 rounded-full border border-black p-2 px-4 ${
+            className={`w-1/3 rounded-full border border-black p-2 px-3 ${
               formik.touched.size?.height && formik.errors.size?.height
                 ? 'border-red-500'
                 : 'border-black'

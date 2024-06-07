@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
   firstname: { type: String, required: true },
   lastname: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  phone: { type: String, required: true, unique: true },
+  phone: { type: String, unique: true },
   password: { type: String, required: true },
   role: {
     type: String,
@@ -29,11 +29,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['Active', 'Inactive']
   },
-  profile: profileSchema
+  profile: profileSchema,
+  stripeAccountId: { type: String }
 });
 
 // Password hash
 userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    return next();
+  }
+
   try {
     const salt = await bcrypt.genSalt(10); // Add random 10 symbols string to the hashed password
     const hashedPassword = await bcrypt.hash(this.password, salt);

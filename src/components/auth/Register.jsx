@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Logo } from '../logo';
 import { UserIcon, LockClosedIcon, EnvelopeIcon } from '@heroicons/react/24/solid';
 import { Link, useNavigate } from 'react-router-dom';
+import { UserContext } from '../../contexts/UserContext';
 
 const validationSchema = Yup.object({
   username: Yup.string().required('Username is required'),
@@ -30,6 +31,8 @@ const validationSchema = Yup.object({
 
 export const Register = () => {
   const navigate = useNavigate();
+  const { updateCurrentUser } = useContext(UserContext);
+
   const formik = useFormik({
     initialValues: {
       username: '',
@@ -47,6 +50,7 @@ export const Register = () => {
           headers: {
             'Content-Type': 'application/json'
           },
+          credentials: 'include',
           body: JSON.stringify(values)
         });
 
@@ -54,7 +58,9 @@ export const Register = () => {
 
         if (response.ok) {
           console.log(data.message); // Registration successful
-          navigate('/profile');
+          document.cookie = `token=${data.token}; path=/; max-age=3600; SameSite=Lax`;
+          updateCurrentUser(data.user);
+          navigate(`/profile/${values.username}`);
         } else {
           console.error(data.message); // Registration failed (error)
         }

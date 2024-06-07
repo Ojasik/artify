@@ -239,7 +239,7 @@ router.put('/:id', authenticateJWT, upload.array('images'), async (req, res) => 
 router.delete('/:id', authenticateJWT, async (req, res) => {
   try {
     const { id } = req.params;
-    const { username } = req.user;
+    const { username, role } = req.user;
 
     // Find the artwork in the database
     const artwork = await Artwork.findById(id);
@@ -250,7 +250,7 @@ router.delete('/:id', authenticateJWT, async (req, res) => {
     }
 
     // Check if the authenticated user is the creator of the artwork
-    if (artwork.createdBy !== username) {
+    if (artwork.createdBy !== username && (role !== 'Moderator' || role !== 'Admin')) {
       return res
         .status(403)
         .json({ message: 'Forbidden: You are not the creator of this artwork' });

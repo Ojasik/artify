@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 import { Disclosure } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon, ShoppingCartIcon, HeartIcon } from '@heroicons/react/24/outline';
 import { AddArtworkModal } from '../artwork/AddArtworkModal';
+import Cart from '../Cart';
 
 // Array with categories buttons (TEST)
 
@@ -28,6 +29,7 @@ export const Navbar = ({ onArtworkUpdate }) => {
   const [isAddArtworkModalOpen, setIsAddArtworkModalOpen] = useState(false);
   const { currentUser, role } = useContext(UserContext);
   const { selectedCategory, setSelectedCategory } = useCategory();
+  const [cartVisible, setCartVisible] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -87,7 +89,7 @@ export const Navbar = ({ onArtworkUpdate }) => {
                   <button
                     type="button"
                     className="rounded-full bg-white pr-1 text-black hover:text-mainColor focus:outline-none">
-                    <ShoppingCartIcon className="h-8 w-8" />
+                    <ShoppingCartIcon className="h-8 w-8" onClick={setCartVisible} />
                   </button>
                 </div>
                 {currentUser ? (
@@ -95,6 +97,11 @@ export const Navbar = ({ onArtworkUpdate }) => {
                     {/* If logged in, show profile and logout buttons */}
                     {(role === 'Admin' || role === 'Moderator') && (
                       <>
+                        <Link to="/orderregistry">
+                          <button className="p-1 text-black hover:text-mainColor">
+                            Order Registry
+                          </button>
+                        </Link>
                         <Link to="/userregistry">
                           <button className="p-1 text-black hover:text-mainColor">
                             User Registry
@@ -164,13 +171,12 @@ export const Navbar = ({ onArtworkUpdate }) => {
                   className="rounded-full bg-gray-50 p-1 text-black hover:text-mainColor focus:outline-none">
                   <HeartIcon className="h-8 w-8" />
                 </button>
-                <Link to="/cart">
-                  <button
-                    type="button"
-                    className="rounded-full bg-gray-50 p-1 text-black hover:text-mainColor focus:outline-none">
-                    <ShoppingCartIcon className="h-8 w-8" />
-                  </button>
-                </Link>
+
+                <button
+                  type="button"
+                  className="rounded-full bg-gray-50 p-1 text-black hover:text-mainColor focus:outline-none">
+                  <ShoppingCartIcon className="h-8 w-8" onClick={setCartVisible} />
+                </button>
               </div>
             </div>
             <hr className="hidden sm:block" />
@@ -223,6 +229,12 @@ export const Navbar = ({ onArtworkUpdate }) => {
               )}
             </div>
           </Disclosure.Panel>
+          <Cart
+            isOpen={cartVisible}
+            onCancel={() => {
+              setCartVisible(false);
+            }}
+          />
         </div>
       )}
     </Disclosure>

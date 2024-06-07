@@ -1,17 +1,17 @@
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
-import { Navbar } from './common/Navbar';
-import { ArtworkCard } from './artwork/ArtworkCard';
+import { Drawer, Button } from 'antd';
+import { CloseOutlined } from '@ant-design/icons';
 
-const Cart = () => {
+const Cart = ({ isOpen, onCancel }) => {
   const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
     fetchCartItems();
-  }, []);
+  }, [onCancel]);
 
   const fetchCartItems = async () => {
     try {
-      // Make a GET request to fetch cart items
       const response = await fetch('http://localhost:8000/api/cart', {
         credentials: 'include'
       });
@@ -29,14 +29,12 @@ const Cart = () => {
 
   const handleDeleteArtwork = async (itemId) => {
     try {
-      // Make a DELETE request to remove the artwork from the cart
       const response = await fetch(`http://localhost:8000/api/cart/${itemId}`, {
         method: 'DELETE',
         credentials: 'include'
       });
 
       if (response.ok) {
-        // Remove the deleted artwork from the cart items list
         setCartItems((prevCartItems) => prevCartItems.filter((item) => item._id !== itemId));
         console.log('Artwork deleted from cart successfully');
       } else {
@@ -47,23 +45,56 @@ const Cart = () => {
     }
   };
 
+  const calculateSubtotal = () => {
+    return cartItems.reduce((total, item) => total + item.artwork_id.price, 0).toFixed(2);
+  };
+
+  const renderArtworks = () => {
+    if (cartItems.length === 0) {
+      return <div>Shopping cart is empty</div>;
+    }
+
+    return cartItems.map((item, index) => (
+      <div key={item._id} className={`py-4 ${index !== 0 ? 'border-t' : ''}`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <img
+              src={item.artwork_id.images[0].data}
+              alt={item.artwork_id.title}
+              className="mr-4 h-20 w-20 rounded-lg object-cover"
+            />
+            <div>
+              <h3 className="text-xl font-semibold">{item.artwork_id.title}</h3>
+              <p className="text-gray-700">{item.artwork_id.price.toFixed(2)} €</p>
+              <p className="text-gray-700">{item.artwork_id.createdBy}</p>
+            </div>
+          </div>
+          <CloseOutlined
+            className="cursor-pointer text-xl text-red-500 hover:text-red-700"
+            onClick={() => handleDeleteArtwork(item._id)}
+          />
+        </div>
+      </div>
+    ));
+  };
+
   return (
     <>
-      <Navbar />
-      <div className="m-auto grid max-w-screen-2xl grid-cols-1 gap-4 p-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {cartItems.map((item) => (
-          <ArtworkCard
-            key={item._id}
-            artwork={item.artwork_id}
-            handleReadMore={() => {}}
-            openArtworkEditModal={() => {}}
-            handleDeleteArtwork={() => handleDeleteArtwork(item._id)}
-            showBuyButton={false}
-            showEditButton={false}
-            showDeleteButton={true}
-          />
-        ))}
-      </div>
+      <Drawer title="Cart" placement="right" open={isOpen} width={400} onClose={onCancel}>
+        <div>{renderArtworks()}</div>
+        {cartItems.length > 0 && (
+          <div className="mt-auto border-t pt-4">
+            <div className="mb-2 flex justify-between">
+              <span>Subtotal</span>
+              <span>{calculateSubtotal()} €</span>
+            </div>
+            <div className="mb-2 text-gray-700">Shipping calculated at checkout</div>
+            <Button type="primary" block disabled={cartItems.length === 0}>
+              CHECK OUT
+            </Button>
+          </div>
+        )}
+      </Drawer>
     </>
   );
 };

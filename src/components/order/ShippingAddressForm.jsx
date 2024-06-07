@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { UserContext } from '../../contexts/UserContext';
 
-const ShippingAddressForm = ({ onShippingCostChange, artworkWeight }) => {
+const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artwork }) => {
   const [countries, setCountries] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState('');
   const [shippingCost, setShippingCost] = useState(0);
@@ -28,7 +28,17 @@ const ShippingAddressForm = ({ onShippingCostChange, artworkWeight }) => {
     if (selectedCountry) {
       calculateShippingCost();
     }
-  }, [selectedCountry, artworkWeight]);
+  }, [
+    selectedCountry,
+    artwork.size.weight,
+    artwork.size.height,
+    artwork.size.width,
+    artwork.size.length
+  ]);
+
+  useEffect(() => {
+    onFormDataChange(formData);
+  }, [formData, onFormDataChange]);
 
   const fetchAddress = async () => {
     try {
@@ -60,7 +70,14 @@ const ShippingAddressForm = ({ onShippingCostChange, artworkWeight }) => {
   };
 
   const calculateShippingCost = async () => {
-    if (!selectedCountry || !artworkWeight) return;
+    if (
+      !selectedCountry ||
+      !artwork.weight ||
+      !artwork.size.height ||
+      !artwork.size.width ||
+      !artwork.size.length
+    )
+      return;
 
     try {
       const response = await fetch('http://localhost:8000/api/shippingrates/calculate-shipping', {
@@ -68,7 +85,13 @@ const ShippingAddressForm = ({ onShippingCostChange, artworkWeight }) => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ country: selectedCountry, weight: artworkWeight })
+        body: JSON.stringify({
+          country: selectedCountry,
+          weight: artwork.weight,
+          height: artwork.size.height,
+          width: artwork.size.width,
+          length: artwork.size.length
+        })
       });
 
       if (!response.ok) {
@@ -87,6 +110,7 @@ const ShippingAddressForm = ({ onShippingCostChange, artworkWeight }) => {
 
   const handleCountryChange = (e) => {
     setSelectedCountry(e.target.value);
+    setFormData({ ...formData, country: e.target.value });
   };
 
   const handleInputChange = (e) => {
@@ -101,6 +125,7 @@ const ShippingAddressForm = ({ onShippingCostChange, artworkWeight }) => {
         <div className="mb-4">
           <label className="block pl-4 text-sm font-medium text-mainColor">Country/Region</label>
           <select
+            name="country"
             value={selectedCountry}
             onChange={handleCountryChange}
             className="w-full rounded-full border border-black p-2 px-4">
