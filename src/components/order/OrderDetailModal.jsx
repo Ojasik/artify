@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
-import { Modal, message, Popconfirm } from 'antd';
+import { Modal, message } from 'antd';
 
 const OrderDetailModal = ({ orderDetails, visible, onClose, onUpdate }) => {
   if (!orderDetails) return null;
@@ -90,45 +90,6 @@ const OrderDetailModal = ({ orderDetails, visible, onClose, onUpdate }) => {
     }
   };
 
-  const handleCancelOrder = async () => {
-    try {
-      if (paymentCompleted) {
-        message.error('Order cannot be cancelled because payment has been sent.');
-        return;
-      }
-
-      // Update status of all artworks to "Cancelled"
-      const updatedArtworks = orderDetails.artworks.map((artwork) => ({
-        ...artwork,
-        status: 'Cancelled'
-      }));
-
-      // Update order status and artwork statuses
-      const response = await fetch(
-        `http://localhost:8000/api/orders/update-order-status/${orderDetails._id}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include',
-          body: JSON.stringify({ status: 'Cancelled', artworks: updatedArtworks })
-        }
-      );
-
-      if (response.ok) {
-        message.success('Order cancelled successfully');
-        onUpdate();
-        onClose();
-      } else {
-        message.error('Failed to cancel order');
-      }
-    } catch (error) {
-      console.error('Error cancelling order:', error);
-      message.error('Failed to cancel order');
-    }
-  };
-
   const handleStatusChange = (event) => {
     const newStatus = event.target.value;
     setSelectedStatus(newStatus);
@@ -171,27 +132,16 @@ const OrderDetailModal = ({ orderDetails, visible, onClose, onUpdate }) => {
           <div key="created-at" className="flex items-center text-gray-600">
             <p className="mr-4 mt-3 text-base">
               <span className="text-base font-semibold">Created At:</span>{' '}
-              {new Date(orderDetails.createdAt).toLocaleString()}
+              {new Date(createdAt).toLocaleString()}
             </p>
           </div>
           <div>
-            <Popconfirm
-              title="Are you sure you want to cancel this order?"
-              onConfirm={handleCancelOrder}
-              disabled={paymentCompleted}
-              okText="Yes"
-              cancelText="No">
-              <button
-                key="cancel"
-                className={`mt-3 inline-flex w-full justify-center rounded-full ${
-                  paymentCompleted
-                    ? 'cursor-not-allowed bg-gray-300'
-                    : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
-                } px-6 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 sm:mt-0 sm:w-auto`}
-                disabled={paymentCompleted}>
-                Cancel
-              </button>
-            </Popconfirm>
+            <button
+              key="cancel"
+              className="mt-3 inline-flex w-full justify-center rounded-full bg-white px-6 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+              onClick={onClose}>
+              Cancel
+            </button>
             <button
               key="save"
               className="inline-flex w-full justify-center rounded-full bg-mainColor px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-hoverColor sm:ml-3 sm:w-auto"
