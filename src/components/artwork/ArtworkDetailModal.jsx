@@ -16,11 +16,15 @@ const getImageContainerClass = (numImages) => {
 const getStatusStyles = (status) => {
   switch (status) {
     case 'Uploaded':
-      return 'bg-red-200 text-red-800';
+      return 'bg-yellow-200 text-yellow-800';
     case 'Verified':
       return 'bg-green-200 text-green-800';
     case 'Sold':
       return 'bg-purple-200 text-mainColor';
+    case 'In Order':
+      return 'bg-blue-200 text-blue-800';
+    case 'Rejected':
+      return 'bg-red-200 text-red-800';
     default:
       return 'bg-gray-200 text-gray-800';
   }
@@ -148,6 +152,7 @@ export const ArtworkDetailModal = ({
                 {artworkDetails.status}
               </span>
             </div>
+            <hr className="mb-4" />
 
             {artworkDetails.price && (
               <p>
@@ -171,9 +176,36 @@ export const ArtworkDetailModal = ({
               </>
             ) : null}
 
+            <hr className="my-4" />
+
             {artworkDetails.category && (
               <p>
                 <span className="text-lg font-semibold">Category:</span> {artworkDetails.category}
+              </p>
+            )}
+            <hr className="my-4" />
+            {artworkDetails.weight && (
+              <p>
+                <span className="text-lg font-semibold">Weight:</span> {artworkDetails.weight} kg
+              </p>
+            )}
+            {artworkDetails.size && (
+              <p>
+                <span className="text-lg font-semibold">Size:</span> {artworkDetails.size.length} x{' '}
+                {artworkDetails.size.width} x {artworkDetails.size.height} cm
+              </p>
+            )}
+            <hr className="my-4" />
+            {artworkDetails.about && (
+              <div className="w-80 overflow-hidden">
+                <p className="text-lg font-semibold">About:</p>
+                <p className="text-sm">{artworkDetails.about}</p>
+              </div>
+            )}
+            {artworkDetails.status === 'Rejected' && artworkDetails.rejectionReason && (
+              <p>
+                <span className="text-lg font-semibold">Rejection Reason:</span>{' '}
+                {artworkDetails.rejectionReason}
               </p>
             )}
           </div>

@@ -1,10 +1,13 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { Drawer, Button } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 
 const Cart = ({ isOpen, onCancel }) => {
   const [cartItems, setCartItems] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchCartItems();
@@ -78,6 +81,11 @@ const Cart = ({ isOpen, onCancel }) => {
     ));
   };
 
+  const handleCheckout = () => {
+    const artworks = cartItems.map((item) => item.artwork_id);
+    navigate('/order', { state: { artworks } });
+  };
+
   return (
     <>
       <Drawer title="Cart" placement="right" open={isOpen} width={400} onClose={onCancel}>
@@ -89,7 +97,7 @@ const Cart = ({ isOpen, onCancel }) => {
               <span>{calculateSubtotal()} €</span>
             </div>
             <div className="mb-2 text-gray-700">Shipping calculated at checkout</div>
-            <Button type="primary" block disabled={cartItems.length === 0}>
+            <Button type="primary" block disabled={cartItems.length === 0} onClick={handleCheckout}>
               CHECK OUT
             </Button>
           </div>

@@ -10,28 +10,16 @@ import { ArtworkCard } from '../artwork/ArtworkCard';
 import { Pagination } from '@mui/material';
 import { UserContext } from '../../contexts/UserContext';
 import { ClipLoader } from 'react-spinners';
-import { Select, Input, DatePicker, InputNumber } from 'antd';
-const { RangePicker } = DatePicker;
-
-import './Select.css';
-
-const { Option } = Select;
-
-const profilePages = [
-  { name: 'Artworks', href: '#', current: true },
-  { name: 'Likes', href: '#', current: false },
-  { name: 'Following', href: '#', current: false },
-  { name: 'Followers', href: '#', current: false },
-  { name: 'My Orders', href: '#', current: false }
-];
+import OrderCard from '../order/OrderCard';
+import Filter from '../filter/FIlter';
 
 export const Profile = () => {
+  const [selectedPage, setSelectedPage] = useState('Artworks');
   const { username: profileUsername } = useParams();
   const { currentUser } = useContext(UserContext);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedArtworkDetails, setSelectedArtworkDetails] = useState(null);
   const [userProfile, setUserProfile] = useState({});
-  const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isArtworkEditModalOpen, setIsArtworkEditModalOpen] = useState(false);
   const [selectedArtworkForEdit, setSelectedArtworkForEdit] = useState(null);
@@ -46,6 +34,16 @@ export const Profile = () => {
   const [priceRange, setPriceRange] = useState([0, 100000]);
   const [dateRange, setDateRange] = useState([null, null]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [userOrders, setUserOrders] = useState([]);
+
+  const profilePages = [
+    { name: 'Artworks', href: '#', current: selectedPage === 'Artworks' },
+    { name: 'My Orders', href: '#', current: selectedPage === 'My Orders' }
+  ];
+
+  const handleSelectedPageChange = (pageName) => {
+    setSelectedPage(pageName);
+  };
 
   const handleReadMore = (artworkDetails) => {
     setSelectedArtworkDetails(artworkDetails);
@@ -118,8 +116,6 @@ export const Profile = () => {
       }
     } catch (error) {
       console.error('Error during profile data fetch:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -127,16 +123,44 @@ export const Profile = () => {
     fetchProfileData();
   }, [profileUsername]);
 
+  useEffect(() => {
+    fetchUserOrders();
+  }, []);
+
+  const fetchUserOrders = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/orders/orders-profile`, {
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUserOrders(data);
+      } else {
+        console.error('Failed to fetch user orders');
+      }
+    } catch (error) {
+      console.error('Error fetching user orders:', error);
+    }
+  };
+
   const fetchUserArtworks = async (page = 1) => {
     setLoadingArtworks(true);
     try {
       if (userProfile.username) {
         let apiUrl = `http://localhost:8000/api/artworks/user/${userProfile.username}?page=${page}&limit=${artworksPerPage}`;
 
-        // Add filters and sorting options
-        if (selectedStatus) {
-          apiUrl += `&status=${selectedStatus}`;
+        if (userProfile.username !== currentUser) {
+          // If the user is not the owner, only fetch artworks with status "Verified"
+          apiUrl += `&status=Verified`;
+        } else {
+          // If the user is the owner, fetch all artworks
+          if (selectedStatus) {
+            apiUrl += `&status=${selectedStatus}`;
+          }
         }
+        // Add filters and sorting options
+
         if (selectedSortOrder) {
           apiUrl += `&sort=${selectedSortOrder}`;
         }
@@ -214,10 +238,6 @@ export const Profile = () => {
     fetchUserArtworks(currentPage);
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <>
       <Navbar onArtworkUpdate={handleArtworkUpdate} />
@@ -232,115 +252,71 @@ export const Profile = () => {
       <div className="mx-auto flex max-w-screen-2xl flex-col justify-between gap-20 px-8 sm:flex-row">
         <UserCard userProfile={userProfile} openEditModal={openEditModal} />
         <div className="flex w-full flex-col items-center sm:items-start">
-          <ProfilePagesLinks profilePages={profilePages} />
-          <>
-            {/* First row */}
-            <div className="mb-4 flex items-start gap-4">
-              <Select
-                value={selectedStatus}
-                placeholder="Select status"
-                onChange={(value) => setSelectedStatus(value)}
-                mode="multiple"
-                className="w-32">
-                <Option value="Uploaded">Uploaded</Option>
-                <Option value="Verified">Verified</Option>
-                <Option value="Sold">Sold</Option>
-              </Select>
-              <Select
-                value={selectedSortOrder}
-                placeholder="Sort by price"
-                onChange={(value) => setSelectedSortOrder(value)}>
-                <Option value="asc">Price: Low to High</Option>
-                <Option value="desc">Price: High to Low</Option>
-              </Select>
-              <Select
-                value={selectedCategory}
-                placeholder="Select category"
-                onChange={(value) => setSelectedCategory(value)}
-                mode="multiple"
-                className="w-36">
-                <Option value="Painting">Painting</Option>
-                <Option value="Sculpture">Sculpture</Option>
-                <Option value="Photography">Photography</Option>
-              </Select>
-              <Input
-                placeholder="Search artworks"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-72"
-              />
-            </div>
-
-            {/* Second row */}
-            <div className="flex items-start gap-4">
-              <RangePicker
-                value={dateRange}
-                onChange={(range) => setDateRange(range)}
-                placeholder={['Start Date', 'End Date']}
-              />
-              <div className="flex items-center gap-2">
-                <InputNumber
-                  min={0}
-                  max={100000}
-                  value={priceRange[0]}
-                  onChange={(value) => setPriceRange([value, priceRange[1]])}
-                  placeholder="Min Price"
-                  addonAfter="€"
-                  className="w-28"
-                />
-                <div className="w-4 border-b border-gray-300"></div>
-                <InputNumber
-                  min={0}
-                  max={100000}
-                  value={priceRange[1]}
-                  onChange={(value) => {
-                    // Ensure that the second price is not larger than the first
-                    if (value >= priceRange[0]) {
-                      setPriceRange([priceRange[0], value]);
-                    }
-                  }}
-                  placeholder="Max Price"
-                  addonAfter="€"
-                  className="w-28"
-                />
-              </div>
-              <button
-                onClick={clearFilters}
-                className="mb-4 rounded-md bg-red-500 px-8 py-1 text-white">
-                Clear Filters
-              </button>
-            </div>
-          </>
-
-          {loadingArtworks ? (
-            <div className="flex h-full w-full items-center justify-center">
-              <ClipLoader size={50} color={'#7734e7'} loading={loadingArtworks} />
-            </div>
-          ) : userArtworks.length === 0 ? (
-            <div>There are no artworks</div>
+          {currentUser === profileUsername ? (
+            <ProfilePagesLinks
+              profilePages={profilePages}
+              onPageChange={handleSelectedPageChange}
+            />
           ) : (
-            <>
-              <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {userArtworks.map((artwork) => (
-                  <ArtworkCard
-                    key={artwork._id}
-                    artwork={artwork}
-                    handleReadMore={handleReadMore}
-                    openArtworkEditModal={openArtworkEditModal}
-                    handleDeleteArtwork={handleDeleteArtwork}
-                    showBuyButton={userProfile.username !== currentUser}
-                    showEditButton={userProfile.username === currentUser}
-                    showDeleteButton={userProfile.username === currentUser}
-                  />
-                ))}
+            <div style={{ height: '50px' }}></div>
+          )}
+          {selectedPage === 'Artworks' && (
+            <Filter
+              userProfile={userProfile}
+              currentUser={currentUser}
+              selectedStatus={selectedStatus}
+              setSelectedStatus={setSelectedStatus}
+              selectedSortOrder={selectedSortOrder}
+              setSelectedSortOrder={setSelectedSortOrder}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              priceRange={priceRange}
+              setPriceRange={setPriceRange}
+              dateRange={dateRange}
+              setDateRange={setDateRange}
+              clearFilters={clearFilters}
+            />
+          )}
+
+          {selectedPage === 'Artworks' ? (
+            loadingArtworks ? (
+              <div className="flex h-full w-full items-center justify-center">
+                <ClipLoader size={50} color={'#7734e7'} loading={loadingArtworks} />
               </div>
-              <Pagination
-                count={Math.ceil(totalArtworks / artworksPerPage)}
-                page={currentPage}
-                onChange={handlePageChange}
-                className="mt-2"
-              />
-            </>
+            ) : userArtworks.length === 0 ? (
+              <div>There are no artworks</div>
+            ) : (
+              <>
+                <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {userArtworks.map((artwork) => (
+                    <ArtworkCard
+                      key={artwork._id}
+                      artwork={artwork}
+                      handleReadMore={handleReadMore}
+                      openArtworkEditModal={openArtworkEditModal}
+                      handleDeleteArtwork={handleDeleteArtwork}
+                      showBuyButton={userProfile.username !== currentUser}
+                      showEditButton={userProfile.username === currentUser}
+                      showDeleteButton={userProfile.username === currentUser}
+                    />
+                  ))}
+                </div>
+                <Pagination
+                  count={Math.ceil(totalArtworks / artworksPerPage)}
+                  page={currentPage}
+                  onChange={handlePageChange}
+                  className="mt-4"
+                />
+              </>
+            )
+          ) : (
+            <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {userOrders.map((order) => (
+                <OrderCard key={order._id} order={order} onUpdate={fetchUserOrders} />
+              ))}
+            </div>
           )}
         </div>
       </div>

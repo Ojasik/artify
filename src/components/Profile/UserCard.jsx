@@ -50,7 +50,7 @@ export const UserCard = ({ userProfile, openEditModal }) => {
   };
 
   return (
-    <div className="flex w-full flex-col items-center gap-4 pt-12 sm:w-80">
+    <div className="flex w-full flex-col items-center gap-4 overflow-hidden pt-12 sm:w-80">
       {/* User Icon */}
       <Avatar imageUrl={userProfile.avatar} />
       <div className="text-center">
@@ -59,15 +59,20 @@ export const UserCard = ({ userProfile, openEditModal }) => {
         </h1>
         <h1 className="text-lg">{userProfile.username}</h1>
       </div>
-      <p className="px-6 text-center text-gray-500">{userProfile.description}</p>
-      <div className="flex gap-2">
-        <GlobeAltIcon className="w-4 text-gray-500" />
-        <a className="font-semibold" href="">
-          {userProfile.website}
-        </a>
-      </div>
+      {userProfile.description && (
+        <p className="overflow-wrap max-w-full break-words px-6 text-center text-gray-500">
+          {userProfile.description}
+        </p>
+      )}
+      {userProfile.website && (
+        <div className="flex gap-2">
+          <GlobeAltIcon className="w-4 text-gray-500" />
+          <a className="font-semibold" href="">
+            {userProfile.website}
+          </a>
+        </div>
+      )}
       <div className="flex flex-col items-center gap-4">
-        <button className="w-52 rounded-3xl bg-mainColor py-2 text-white">Follow</button>
         <div className="flex gap-6">
           {userProfile.facebook && (
             <a href={userProfile.facebook} target="_blank" rel="noopener noreferrer">
@@ -92,7 +97,7 @@ export const UserCard = ({ userProfile, openEditModal }) => {
         <div className="flex gap-4">
           <CarOutlined onClick={openAddressModal} />
           <button
-            className="rounded-3xl border border-mainColor px-6 py-2 text-mainColor"
+            className="rounded-full border border-mainColor px-6 py-2 text-mainColor transition-colors duration-300 hover:bg-mainColor hover:text-white"
             onClick={openEditModal}>
             Edit profile
           </button>

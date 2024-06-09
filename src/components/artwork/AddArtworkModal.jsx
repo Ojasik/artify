@@ -95,7 +95,7 @@ export const AddArtworkModal = ({ isOpen, onClose, onArtworkUpdate }) => {
 
         if (response.ok) {
           console.log('Artwork added successfully');
-          onArtworkUpdate();
+          onArtworkUpdate?.();
           resetForm();
           setImages([]);
           onClose();

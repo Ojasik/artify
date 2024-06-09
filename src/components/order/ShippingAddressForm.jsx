@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { UserContext } from '../../contexts/UserContext';
 
-const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artwork }) => {
+const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artworks }) => {
   const [countries, setCountries] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState('');
   const [shippingCost, setShippingCost] = useState(0);
@@ -28,13 +28,7 @@ const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artwork }
     if (selectedCountry) {
       calculateShippingCost();
     }
-  }, [
-    selectedCountry,
-    artwork.size.weight,
-    artwork.size.height,
-    artwork.size.width,
-    artwork.size.length
-  ]);
+  }, [selectedCountry]);
 
   useEffect(() => {
     onFormDataChange(formData);
@@ -70,39 +64,39 @@ const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artwork }
   };
 
   const calculateShippingCost = async () => {
-    if (
-      !selectedCountry ||
-      !artwork.weight ||
-      !artwork.size.height ||
-      !artwork.size.width ||
-      !artwork.size.length
-    )
-      return;
+    if (!selectedCountry || !artworks.length) return;
 
     try {
-      const response = await fetch('http://localhost:8000/api/shippingrates/calculate-shipping', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          country: selectedCountry,
-          weight: artwork.weight,
-          height: artwork.size.height,
-          width: artwork.size.width,
-          length: artwork.size.length
-        })
-      });
+      let totalShippingCost = 0;
 
-      if (!response.ok) {
-        throw new Error('Failed to calculate shipping cost');
+      for (const artwork of artworks) {
+        const response = await fetch('http://localhost:8000/api/shippingrates/calculate-shipping', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            country: selectedCountry,
+            weight: artwork.weight,
+            height: artwork.size.height,
+            width: artwork.size.width,
+            length: artwork.size.length
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to calculate shipping cost');
+        }
+
+        const data = await response.json();
+        totalShippingCost += data.shippingCost;
+        console.log(`Shipping cost for artwork ${artwork._id}: ${shippingCost}`);
       }
 
-      const data = await response.json();
-      setShippingCost(data.shippingCost);
+      setShippingCost(totalShippingCost);
 
-      // Pass the shipping cost back to the parent component
-      onShippingCostChange(data.shippingCost);
+      // Pass the total shipping cost back to the parent component
+      onShippingCostChange(totalShippingCost);
     } catch (error) {
       console.error('Error calculating shipping cost:', error);
     }
@@ -129,6 +123,9 @@ const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artwork }
             value={selectedCountry}
             onChange={handleCountryChange}
             className="w-full rounded-full border border-black p-2 px-4">
+            <option value="" disabled>
+              Select Country
+            </option>
             {countries.map((country, index) => (
               <option key={index}>{country.country}</option>
             ))}

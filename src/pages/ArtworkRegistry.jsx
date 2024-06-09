@@ -6,6 +6,7 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { UserContext } from '../contexts/UserContext';
 import { EditOutlined } from '@ant-design/icons';
 import { ArtworkDetailModal } from '../components/artwork/ArtworkDetailModal';
+import { Popover } from 'antd';
 
 export const ArtworkRegistry = () => {
   const [artworks, setArtworks] = useState([]);
@@ -48,11 +49,13 @@ export const ArtworkRegistry = () => {
       case 'Verified':
         return 'bg-green-200 text-green-800';
       case 'Rejected':
-        return 'bg-gray-300 text-gray-800';
-      case 'Uploaded':
         return 'bg-red-200 text-red-800';
+      case 'Uploaded':
+        return 'bg-yellow-200 text-yellow-800';
       case 'Sold':
         return 'bg-purple-200 text-purple-800';
+      case 'In Order':
+        return 'bg-blue-200 text-blue-800';
       default:
         return '';
     }
@@ -69,7 +72,21 @@ export const ArtworkRegistry = () => {
       filter: true,
       flex: 1,
       cellStyle: { textAlign: 'center' },
-      cellRenderer: ({ value }) => <div className={getStatusClass(value)}>{value}</div>
+      cellRenderer: ({ value, data }) => {
+        return (
+          <Popover
+            content={
+              value === 'Rejected' ? (
+                <div>
+                  <strong>Rejection reason</strong>
+                  <div style={{ paddingTop: '4px' }}>{data.rejectionReason}</div>
+                </div>
+              ) : null
+            }>
+            <div className={getStatusClass(value)}>{value}</div>
+          </Popover>
+        );
+      }
     },
     { headerName: 'Category', field: 'category', sortable: true, filter: true, flex: 1 },
     { headerName: 'Created By', field: 'createdBy', sortable: true, filter: true, flex: 1 },

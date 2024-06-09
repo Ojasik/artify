@@ -52,7 +52,8 @@ export const MainPage = () => {
       const response = await fetch('http://localhost:8000/api/artworks');
       if (response.ok) {
         const artworksData = await response.json();
-        setArtworks(artworksData);
+        const verifiedArtworks = artworksData.filter((artwork) => artwork.status === 'Verified');
+        setArtworks(verifiedArtworks);
       } else {
         console.error('Failed to fetch artworks');
       }
@@ -83,7 +84,10 @@ export const MainPage = () => {
     selectedCategory === 'All'
       ? artworks.filter((artwork) => artwork.createdBy !== currentUser)
       : artworks.filter(
-          (artwork) => artwork.category === selectedCategory && artwork.createdBy !== currentUser
+          (artwork) =>
+            artwork.category === selectedCategory &&
+            artwork.createdBy !== currentUser &&
+            artwork.status === 'Verified'
         );
 
   return (

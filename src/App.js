@@ -26,6 +26,7 @@ function App() {
               <Route path="/orderregistry" element={<OrderRegistry />} />
               <Route path="/register" element={<Register />} />
               <Route path="/order/:id" element={<OrderPage />} />
+              <Route path="/order" element={<OrderPage />} />
               <Route path="/cart" element={<Cart />} />
             </Routes>
           </Router>

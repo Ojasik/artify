@@ -24,6 +24,85 @@ function authenticateJWT(req, res, next) {
   });
 }
 
+router.post('/send-money/:artworkId', authenticateJWT, async (req, res) => {
+  try {
+    const { artworkId } = req.params;
+    const { userId } = req.user;
+
+    // Find the artwork
+    const artwork = await Artwork.findById(artworkId);
+    if (!artwork) {
+      return res.status(404).json({ message: 'Artwork not found' });
+    }
+
+    // Find the seller by username
+    const seller = await User.findOne({ username: artwork.createdBy });
+    if (!seller) {
+      return res.status(404).json({ message: 'Seller not found' });
+    }
+
+    // Check if the buyer has a Stripe account linked
+    const buyer = await User.findById(userId);
+    if (!buyer.stripeAccountId) {
+      return res.status(400).json({ message: 'Buyer does not have a Stripe account linked' });
+    }
+
+    // Check if the seller has a Stripe account linked
+    if (!seller.stripeAccountId) {
+      return res.status(400).json({ message: 'Seller does not have a Stripe account linked' });
+    }
+
+    // Initialize Stripe
+    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+    // Create a PaymentIntent
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: artwork.netEarnings * 100, // Convert price to cents
+      currency: 'eur',
+      payment_method: 'pm_card_visa',
+      payment_method_types: ['card'],
+      transfer_data: {
+        destination: seller.stripeAccountId // Transfer money to seller's Stripe account
+      },
+      description: `Payment for artwork: ${artwork.title}`,
+      confirm: true
+    });
+
+    artwork.status = 'Sold';
+    await artwork.save();
+
+    // Respond with client secret for the payment intent
+    res.status(200).json({ clientSecret: paymentIntent.client_secret });
+  } catch (error) {
+    console.error('Error sending money:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+router.put('/update-order-status/:orderId', authenticateJWT, async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { status } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ message: 'Status is required' });
+    }
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    order.status = status;
+    await order.save();
+
+    res.status(200).json({ message: 'Order status updated successfully', order });
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
 router.get('/', async (req, res) => {
   try {
     const orders = await Order.find().populate('userId', 'username').populate('artworks');
@@ -51,6 +130,37 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/orders-profile/', authenticateJWT, async (req, res) => {
+  try {
+    const { userId } = req.user;
+
+    const orders = await Order.find({ userId }).populate('artworks');
+
+    const ordersWithBase64Images = await Promise.all(
+      orders.map(async (order) => {
+        const artworks = await Promise.all(
+          order.artworks.map(async (artworkId) => {
+            const artwork = await Artwork.findById(artworkId);
+            const base64Images = await Promise.all(
+              artwork.images.map(async (image) => ({
+                data: `data:${image.contentType};base64,${image.data.toString('base64')}`,
+                contentType: image.contentType
+              }))
+            );
+            return { ...artwork.toObject(), images: base64Images };
+          })
+        );
+        return { ...order.toObject(), artworks };
+      })
+    );
+
+    res.json(ordersWithBase64Images);
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 router.post('/create-order', authenticateJWT, async (req, res) => {
   try {
     const { userId } = req.user;
@@ -70,11 +180,20 @@ router.post('/create-order', authenticateJWT, async (req, res) => {
       email
     } = req.body;
 
-    console.log(req.body);
+    const updatedArtworks = await Promise.all(
+      artworks.map(async (artworkId) => {
+        const updatedArtwork = await Artwork.findByIdAndUpdate(
+          artworkId,
+          { status: 'In Order' },
+          { new: true }
+        );
+        return updatedArtwork;
+      })
+    );
 
     const newOrder = new Order({
       userId,
-      artworks,
+      artworks: updatedArtworks.map((artwork) => artwork._id),
       totalPrice,
       shippingCost,
       country,

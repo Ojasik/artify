@@ -37,10 +37,12 @@ export const OrderRegistry = () => {
     switch (status) {
       case 'Pending':
         return 'bg-yellow-200 text-yellow-800';
+      case 'Processing':
+        return 'bg-orange-200 text-orange-800';
       case 'Shipped':
         return 'bg-green-200 text-green-800';
       case 'Delivered':
-        return 'bg-blue-200 text-blue-800';
+        return 'bg-purple-200 text-purple-800';
       case 'Cancelled':
         return 'bg-red-200 text-red-800';
       default:
@@ -133,7 +135,12 @@ export const OrderRegistry = () => {
         </div>
       </div>
       {selectedOrder && (
-        <OrderDetailModal visible={isModalOpen} onClose={closeModal} orderDetails={selectedOrder} />
+        <OrderDetailModal
+          visible={isModalOpen}
+          onClose={closeModal}
+          orderDetails={selectedOrder}
+          onUpdate={fetchOrders}
+        />
       )}
     </div>
   );

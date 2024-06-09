@@ -6,7 +6,7 @@ import { UserContext } from '../../contexts/UserContext';
 import { useCategory } from '../../contexts/CategoryContext';
 import PropTypes from 'prop-types';
 import { Disclosure } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon, ShoppingCartIcon, HeartIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
 import { AddArtworkModal } from '../artwork/AddArtworkModal';
 import Cart from '../Cart';
 
@@ -83,11 +83,6 @@ export const Navbar = ({ onArtworkUpdate }) => {
                 <div className="flex items-center gap-4 pr-2 sm:hidden">
                   <button
                     type="button"
-                    className="rounded-full bg-white text-black hover:text-mainColor focus:outline-none">
-                    <HeartIcon className="h-8 w-8" />
-                  </button>
-                  <button
-                    type="button"
                     className="rounded-full bg-white pr-1 text-black hover:text-mainColor focus:outline-none">
                     <ShoppingCartIcon className="h-8 w-8" onClick={setCartVisible} />
                   </button>
@@ -115,7 +110,7 @@ export const Navbar = ({ onArtworkUpdate }) => {
                       </>
                     )}
                     <Link to={`/profile/${currentUser}`}>
-                      <button className="p-1 text-black hover:text-mainColor">Profile</button>
+                      <button className="p-1 pl-8 text-black hover:text-mainColor">Profile</button>
                     </Link>
                     <Logout />
                   </div>
@@ -163,13 +158,8 @@ export const Navbar = ({ onArtworkUpdate }) => {
                 <button
                   type="button"
                   onClick={openAddArtworkModal}
-                  className="rounded-3xl border-2 border-mainColor px-3 font-semibold text-black hover:bg-mainColor hover:text-white">
+                  className="rounded-full border border-mainColor px-3 font-semibold text-black transition-colors duration-300 hover:bg-mainColor hover:text-white">
                   Sell items
-                </button>
-                <button
-                  type="button"
-                  className="rounded-full bg-gray-50 p-1 text-black hover:text-mainColor focus:outline-none">
-                  <HeartIcon className="h-8 w-8" />
                 </button>
 
                 <button

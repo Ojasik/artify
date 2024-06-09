@@ -30,13 +30,19 @@ const CustomStripeInput = ({ label, id, children, cvv }) => (
 const OrderPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { artwork } = location.state || {};
+  const { artworks = [] } = location.state || {};
   const [shippingCost, setShippingCost] = useState(0);
   const [paymentError, setPaymentError] = useState(null);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [formData, setFormData] = useState({});
   const stripe = useStripe();
   const elements = useElements();
+
+  if (!location.state || !location.state.artworks) {
+    // Redirect to the cart page if no order data is found
+    navigate('/');
+    return null; // Return null to prevent rendering anything on this page
+  }
 
   const handleShippingCostChange = (cost) => {
     setShippingCost(cost);
@@ -67,7 +73,9 @@ const OrderPage = () => {
       setPaymentLoading(false);
     } else {
       try {
-        const amountInCents = Math.round((artwork.price + shippingCost) * 100);
+        const amountInCents = Math.round(
+          (artworks.reduce((total, artwork) => total + artwork.price, 0) + shippingCost) * 100
+        );
 
         const response = await fetch('http://localhost:8000/api/orders/create-payment-intent', {
           method: 'POST',
@@ -114,8 +122,8 @@ const OrderPage = () => {
   const saveOrder = async (paymentIntentId) => {
     try {
       const orderData = {
-        artworks: [artwork._id],
-        totalPrice: artwork.price + shippingCost,
+        artworks: artworks.map((artwork) => artwork._id),
+        totalPrice: artworks.reduce((total, artwork) => total + artwork.price, 0) + shippingCost,
         shippingCost,
         country: formData.country,
         firstName: formData.firstName,
@@ -152,7 +160,7 @@ const OrderPage = () => {
       <div className="flex w-full max-w-5xl">
         <div className="w-2/3 p-4">
           <ShippingAddressForm
-            artwork={artwork}
+            artworks={artworks}
             onShippingCostChange={handleShippingCostChange}
             onFormDataChange={handleFormDataChange}
           />
@@ -198,7 +206,7 @@ const OrderPage = () => {
           </div>
         </div>
         <div className="w-1/3 p-4">
-          <OrderSummary artwork={artwork} shippingCost={shippingCost} />
+          <OrderSummary artworks={artworks} shippingCost={shippingCost} />
         </div>
       </div>
     </div>
