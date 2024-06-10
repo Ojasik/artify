@@ -28,11 +28,11 @@ const Artwork = require('./database/Artwork');
 // Define the cron job function
 const removeOutdatedCartItems = async () => {
   try {
-    // Calculate the timestamp 1 minute ago
-    const oneMinuteAgo = new Date(Date.now() - 1 * 60 * 1000);
+    // Calculate the timestamp 30 minutes ago
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
 
     // Find outdated cart items
-    const outdatedCartItems = await Cart.find({ addedAt: { $lt: oneMinuteAgo } });
+    const outdatedCartItems = await Cart.find({ addedAt: { $lt: thirtyMinutesAgo } });
 
     // Iterate over each outdated cart item
     for (const cartItem of outdatedCartItems) {
@@ -55,8 +55,8 @@ const removeOutdatedCartItems = async () => {
   }
 };
 
-// Define the cron schedule (run every minute)
-cron.schedule('* * * * *', removeOutdatedCartItems);
+// Define the cron schedule (run every 30 minutes)
+cron.schedule('*/30 * * * *', removeOutdatedCartItems);
 
 // Export the cron job function
 module.exports = removeOutdatedCartItems;
