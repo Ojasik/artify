@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../database/User');
 const Address = require('../database/Address');
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 function authenticateJWT(req, res, next) {
@@ -23,6 +24,14 @@ function authenticateJWT(req, res, next) {
   });
 }
 
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'meshkis.mark@gmail.com',
+    pass: 'iyxb qpsf igjq ujmw'
+  }
+});
+
 router.post('/register', async (req, res) => {
   try {
     const { username, firstname, lastname, email, phone, password } = req.body;
@@ -33,14 +42,80 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'Username or email already exists' });
     }
 
-    const emptyProfile = {
-      description: '',
-      website: '',
-      x: '',
-      instagram: '',
-      facebook: '',
-      avatar: ''
+    // Generate an email verification token
+    const emailVerificationToken = jwt.sign(
+      { username, firstname, lastname, email, phone, password },
+      process.env.EMAIL_VERIFICATION_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    // Send an email with a verification link
+    const verificationLink = `http://localhost:8000/api/users/verify-email?token=${emailVerificationToken}&fromEmail=true`;
+
+    const mailOptions = {
+      from: 'meshkis.mark@gmail.com',
+      to: email,
+      subject: 'Email Verification',
+      html: `Click <a href="${verificationLink}">here</a> to verify your email address.`
     };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+        return res.status(500).json({ message: 'Failed to send verification email' });
+      }
+      console.log('Email sent:', info.response);
+
+      const token = jwt.sign(
+        {
+          userId: newUser._id,
+          username: newUser.username,
+          role: newUser.role,
+          firstname: newUser.firstname,
+          lastname: newUser.lastname,
+          phone: newUser.phone,
+          email: newUser.email
+        },
+        process.env.JWT,
+        { expiresIn: '1h' }
+      );
+
+      res.cookie('token', token, {
+        httpOnly: true,
+        maxAge: 3600000, // 1 hour expiration
+        sameSite: 'strict'
+        // secure: true,
+      });
+
+      res.status(200).json({
+        message: 'Verification email sent. Please check your email to complete registration.',
+        token,
+        user: {
+          username: newUser.username,
+          role: newUser.role,
+          userId: newUser._id,
+          firstname: newUser.firstname,
+          lastname: newUser.lastname,
+          phone: newUser.phone,
+          email: newUser.email
+        }
+      });
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.get('/verify-email', async (req, res) => {
+  const { token } = req.query;
+
+  try {
+    // Verify the email verification token
+    const decodedToken = jwt.verify(token, process.env.EMAIL_VERIFICATION_SECRET);
+
+    // Extract user data from the token
+    const { username, firstname, lastname, email, phone, password } = decodedToken;
 
     // Create a new user instance
     const newUser = new User({
@@ -51,14 +126,14 @@ router.post('/register', async (req, res) => {
       phone,
       password,
       role: 'Regular',
-      status: 'Active',
-      profile: emptyProfile
+      status: 'Active' // Set the status to 'Active' upon email verification
     });
 
     // Save the user to the database
     await newUser.save();
 
-    const token = jwt.sign(
+    // Generate JWT token for automatic login
+    const authToken = jwt.sign(
       {
         userId: newUser._id,
         username: newUser.username,
@@ -74,29 +149,18 @@ router.post('/register', async (req, res) => {
       }
     );
 
-    res.cookie('token', token, {
+    res.cookie('token', authToken, {
       httpOnly: true,
       maxAge: 3600000, // 1 hour expiration
       sameSite: 'strict'
       // secure: true,
     });
 
-    res.status(201).json({
-      message: 'User registered successfully',
-      token,
-      user: {
-        username: newUser.username,
-        role: newUser.role,
-        userId: newUser._id,
-        firstname: newUser.firstname,
-        lastname: newUser.lastname,
-        phone: newUser.phone,
-        email: newUser.email
-      }
-    });
+    // Redirect to main page
+    res.redirect('http://localhost:3000/'); // Update '/main' with your main page route
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error('Error verifying email:', error);
+    res.status(400).json({ message: 'Invalid or expired token' });
   }
 });
 

@@ -27,7 +27,6 @@ function authenticateJWT(req, res, next) {
 router.post('/send-money/:artworkId', authenticateJWT, async (req, res) => {
   try {
     const { artworkId } = req.params;
-    const { userId } = req.user;
 
     // Find the artwork
     const artwork = await Artwork.findById(artworkId);
@@ -39,12 +38,6 @@ router.post('/send-money/:artworkId', authenticateJWT, async (req, res) => {
     const seller = await User.findOne({ username: artwork.createdBy });
     if (!seller) {
       return res.status(404).json({ message: 'Seller not found' });
-    }
-
-    // Check if the buyer has a Stripe account linked
-    const buyer = await User.findById(userId);
-    if (!buyer.stripeAccountId) {
-      return res.status(400).json({ message: 'Buyer does not have a Stripe account linked' });
     }
 
     // Check if the seller has a Stripe account linked
@@ -94,6 +87,14 @@ router.put('/update-order-status/:orderId', authenticateJWT, async (req, res) =>
     }
 
     order.status = status;
+
+    if (status === 'Cancelled') {
+      for (const artwork of order.artworks) {
+        artwork.status = 'Verified';
+        await artwork.save();
+      }
+    }
+
     await order.save();
 
     res.status(200).json({ message: 'Order status updated successfully', order });

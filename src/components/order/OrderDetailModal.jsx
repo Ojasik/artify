@@ -1,11 +1,12 @@
 /* eslint-disable react/prop-types */
-import React, { useState, useEffect } from 'react';
-import { Modal, message } from 'antd';
+import React, { useState, useEffect, useContext } from 'react';
+import { Modal, message, Popconfirm } from 'antd';
+import { UserContext } from '../../contexts/UserContext';
 
 const OrderDetailModal = ({ orderDetails, visible, onClose, onUpdate }) => {
   if (!orderDetails) return null;
   const [selectedStatus, setSelectedStatus] = useState(orderDetails ? orderDetails.status : '');
-
+  const { role } = useContext(UserContext);
   const [paymentCompleted, setPaymentCompleted] = useState({});
 
   // Assuming orderDetails contains information about each artwork
@@ -54,15 +55,34 @@ const OrderDetailModal = ({ orderDetails, visible, onClose, onUpdate }) => {
             <p className="text-gray-700">{artwork.createdBy}</p>
           </div>
         </div>
-        {!paymentCompleted[artwork._id] && ( // Check if payment is not completed
-          <button
-            className="rounded-full border border-mainColor px-3 font-semibold text-black transition-colors duration-300 hover:bg-mainColor hover:text-white"
-            onClick={() => handleSendMoney(artwork)}>
-            Send Money
-          </button>
-        )}
+        {(role === 'Admin' || role === 'Moderator') &&
+          !paymentCompleted[artwork._id] &&
+          selectedStatus !== 'Cancelled' && ( // Check if payment is not completed
+            <button
+              className="rounded-full border border-mainColor px-3 font-semibold text-black transition-colors duration-300 hover:bg-mainColor hover:text-white"
+              onClick={() => handleSendMoney(artwork)}>
+              Send Money
+            </button>
+          )}
       </div>
     ));
+  };
+
+  const getStatusStyles = (status) => {
+    switch (status) {
+      case 'Pending':
+        return 'bg-yellow-200 text-yellow-800';
+      case 'Processing':
+        return 'bg-orange-200 text-orange-800';
+      case 'Shipped':
+        return 'bg-green-200 text-green-800';
+      case 'Delivered':
+        return 'bg-purple-200 text-purple-800';
+      case 'Cancelled':
+        return 'bg-red-200 text-red-800';
+      default:
+        return '';
+    }
   };
 
   const handleSendMoney = async (artwork) => {
@@ -95,6 +115,33 @@ const OrderDetailModal = ({ orderDetails, visible, onClose, onUpdate }) => {
     setSelectedStatus(newStatus);
   };
 
+  const handleCancelOrder = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/api/orders/update-order-status/${orderId}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({ status: 'Cancelled' })
+        }
+      );
+
+      if (response.ok) {
+        message.success('Order cancelled successfully');
+        onUpdate();
+        onClose();
+      } else {
+        message.error('Failed to cancel order');
+      }
+    } catch (error) {
+      console.error('Error cancelling order:', error);
+      message.error('Failed to cancel order');
+    }
+  };
+
   const handleSubmit = async () => {
     try {
       const response = await fetch(
@@ -122,6 +169,8 @@ const OrderDetailModal = ({ orderDetails, visible, onClose, onUpdate }) => {
     }
   };
 
+  const hasSentMoney = Object.values(paymentCompleted).some((status) => status);
+
   return (
     <Modal
       title={`Order Details - ${orderId}`}
@@ -136,18 +185,37 @@ const OrderDetailModal = ({ orderDetails, visible, onClose, onUpdate }) => {
             </p>
           </div>
           <div>
-            <button
-              key="cancel"
-              className="mt-3 inline-flex w-full justify-center rounded-full bg-white px-6 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-              onClick={onClose}>
-              Cancel
-            </button>
-            <button
-              key="save"
-              className="inline-flex w-full justify-center rounded-full bg-mainColor px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-hoverColor sm:ml-3 sm:w-auto"
-              onClick={handleSubmit}>
-              Save
-            </button>
+            {(role === 'Admin' || role === 'Moderator') &&
+              !hasSentMoney &&
+              selectedStatus !== 'Cancelled' && (
+                <Popconfirm
+                  title="Are you sure you want to cancel this order?"
+                  onConfirm={handleCancelOrder}
+                  okText="Yes"
+                  cancelText="No">
+                  <button
+                    key="cancelOrder"
+                    className="mr-3 inline-flex justify-center rounded-full bg-red-500 px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 sm:ml-3 sm:w-auto">
+                    Cancel Order
+                  </button>
+                </Popconfirm>
+              )}
+            {(role === 'Admin' || role === 'Moderator') && (
+              <>
+                <button
+                  key="cancel"
+                  className="mt-3 inline-flex w-full justify-center rounded-full bg-white px-6 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                  onClick={onClose}>
+                  Cancel
+                </button>
+                <button
+                  key="save"
+                  className="inline-flex w-full justify-center rounded-full bg-mainColor px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-hoverColor sm:ml-3 sm:w-auto"
+                  onClick={handleSubmit}>
+                  Save
+                </button>
+              </>
+            )}
           </div>
         </div>
       ]}
@@ -177,7 +245,15 @@ const OrderDetailModal = ({ orderDetails, visible, onClose, onUpdate }) => {
         {/* Right Side */}
         <div className="w-1/2 pl-4">
           <div className="p-6">
-            <h2 className="mb-4 text-xl font-semibold">Order Details</h2>
+            <div className="flex items-start">
+              <h2 className="mb-4 text-xl font-semibold">
+                Order Details
+                <span
+                  className={`ml-4 rounded-md p-1 text-xl ${getStatusStyles(orderDetails.status)}`}>
+                  {orderDetails.status}
+                </span>
+              </h2>
+            </div>
             <div className="mt-4 border-t pt-4">
               <div className="mb-2">
                 <h3 className="text-md pb-2 font-medium">Contact Information</h3>
@@ -201,19 +277,20 @@ const OrderDetailModal = ({ orderDetails, visible, onClose, onUpdate }) => {
                   <span>{country}</span>
                 </div>
               </div>
-              <div className="mt-4 border-t pt-4">
-                <h3 className="text-md pb-2 font-medium">Order Status</h3>
-                <select
-                  value={selectedStatus}
-                  onChange={handleStatusChange}
-                  className="mt-2 w-full rounded-md border border-gray-300 p-2">
-                  <option value="Pending">Pending</option>
-                  <option value="Processing">Processing</option>
-                  <option value="Shipped">Shipped</option>
-                  <option value="Delivered">Delivered</option>
-                  <option value="Cancelled">Cancelled</option>
-                </select>
-              </div>
+              {(role === 'Admin' || role === 'Moderator') && selectedStatus !== 'Cancelled' && (
+                <div className="mt-4 border-t pt-4">
+                  <h3 className="text-md pb-2 font-medium">Order Status</h3>
+                  <select
+                    value={selectedStatus}
+                    onChange={handleStatusChange}
+                    className="mt-2 w-full rounded-md border border-gray-300 p-2">
+                    <option value="Pending">Pending</option>
+                    <option value="Processing">Processing</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Delivered">Delivered</option>
+                  </select>
+                </div>
+              )}
             </div>
           </div>
         </div>

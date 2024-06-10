@@ -101,13 +101,7 @@ export const Login = () => {
               )}
             </div>
           </div>
-          <div className="flex w-80 justify-between">
-            <div className="space-x-2">
-              <input type="checkbox" className="accent-mainColor" />
-              <label>Remember me</label>
-            </div>
-            <button className="cursor-pointer">Forgot password?</button>
-          </div>
+
           <input
             className="w-80 cursor-pointer rounded-full bg-mainColor p-2 text-white"
             type="submit"

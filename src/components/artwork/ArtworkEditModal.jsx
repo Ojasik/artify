@@ -211,7 +211,7 @@ export const ArtworkEditModal = ({ isOpen, onClose, artwork, updateArtworks }) =
               required
             />
           </div>
-          <label className="w-80 cursor-pointer rounded-full border border-black p-2 px-4">
+          <label className="inline-flex w-full cursor-pointer justify-center rounded-full bg-mainColor px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-hoverColor sm:ml-3 sm:w-auto">
             Add Images
             <input
               type="file"

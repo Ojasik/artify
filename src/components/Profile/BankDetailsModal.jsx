@@ -13,7 +13,7 @@ const BankDetailsModal = ({ isOpen, onClose, onBankDetailsSubmit }) => {
   return (
     <Modal
       title="Add Bank Details"
-      visible={isOpen} // Changed 'open' to 'visible'
+      open={isOpen}
       onCancel={onClose}
       footer={[
         <button
@@ -36,12 +36,7 @@ const BankDetailsModal = ({ isOpen, onClose, onBankDetailsSubmit }) => {
           rules={[{ required: true, message: 'Please input your IBAN!' }]}>
           <Input placeholder="IBAN" />
         </Form.Item>
-        <Form.Item
-          name="swift"
-          label="SWIFT/BIC Code"
-          rules={[{ required: true, message: 'Please input your SWIFT/BIC code!' }]}>
-          <Input placeholder="SWIFT/BIC Code" />
-        </Form.Item>
+
         <Form.Item
           name="bankName"
           label="Bank Name"
@@ -53,18 +48,6 @@ const BankDetailsModal = ({ isOpen, onClose, onBankDetailsSubmit }) => {
           label="Account Holder Name"
           rules={[{ required: true, message: 'Please input the account holder name!' }]}>
           <Input placeholder="Account Holder Name" />
-        </Form.Item>
-        <Form.Item
-          name="accountNumber"
-          label="Account Number"
-          rules={[{ required: true, message: 'Please input your account number!' }]}>
-          <Input placeholder="Account Number" />
-        </Form.Item>
-        <Form.Item
-          name="routingNumber"
-          label="Routing Number"
-          rules={[{ required: true, message: 'Please input your routing number!' }]}>
-          <Input placeholder="Routing Number" />
         </Form.Item>
       </Form>
     </Modal>

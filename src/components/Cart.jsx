@@ -97,7 +97,12 @@ const Cart = ({ isOpen, onCancel }) => {
               <span>{calculateSubtotal()} €</span>
             </div>
             <div className="mb-2 text-gray-700">Shipping calculated at checkout</div>
-            <Button type="primary" block disabled={cartItems.length === 0} onClick={handleCheckout}>
+            <Button
+              type="primary"
+              block
+              disabled={cartItems.length === 0}
+              onClick={handleCheckout}
+              className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-mainColor px-6 py-1 text-sm font-semibold text-white shadow-sm hover:bg-hoverColor">
               CHECK OUT
             </Button>
           </div>
