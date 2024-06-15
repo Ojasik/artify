@@ -160,9 +160,36 @@ router.get('/user/:username', async (req, res) => {
   }
 });
 
-router.get('/', async (req, res) => {
+router.get('/registry', async (req, res) => {
   try {
     const artworks = await Artwork.find({ isAvailable: true });
+
+    const artworksImagesURL = artworks.map((artwork) => {
+      const imagesURL = artwork.images.map((image) => ({
+        data: `data:${image.contentType};base64,${image.data.toString('base64')}`,
+        contentType: image.contentType
+      }));
+
+      return { ...artwork.toObject(), images: imagesURL };
+    });
+
+    res.status(200).json(artworksImagesURL);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.get('/', async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
+  console.log(`Page: ${page}, Limit: ${limit}`); // Log page and limit
+
+  try {
+    const artworks = await Artwork.find({ isAvailable: true })
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    console.log(`Fetched Artworks: ${artworks.length}`); // Log the number of artworks fetched
 
     const artworksImagesURL = artworks.map((artwork) => {
       const imagesURL = artwork.images.map((image) => ({

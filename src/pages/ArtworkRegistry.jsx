@@ -16,7 +16,7 @@ export const ArtworkRegistry = () => {
 
   const fetchArtworks = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/artworks', {
+      const response = await fetch('http://localhost:8000/api/artworks/registry', {
         credentials: 'include'
       });
 
