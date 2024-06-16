@@ -186,6 +186,7 @@ router.get('/', async (req, res) => {
 
   try {
     const artworks = await Artwork.find({ isAvailable: true })
+      .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(Number(limit));
 
