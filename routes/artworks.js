@@ -181,16 +181,31 @@ router.get('/registry', async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-  const { page = 1, limit = 10 } = req.query;
-  console.log(`Page: ${page}, Limit: ${limit}`); // Log page and limit
+  const { page = 1, limit = 10, minPrice, maxPrice, sortOrder } = req.query;
+
+  let sortCriteria = { createdAt: -1 }; // Default sorting by createdAt
+
+  if (sortOrder === 'asc') {
+    sortCriteria = { price: 1 };
+  } else if (sortOrder === 'desc') {
+    sortCriteria = { price: -1 };
+  }
 
   try {
-    const artworks = await Artwork.find({ isAvailable: true })
-      .sort({ createdAt: -1 })
+    let query = Artwork.find({ isAvailable: true });
+
+    if (minPrice !== undefined && !isNaN(Number(minPrice))) {
+      query = query.where('price').gte(Number(minPrice));
+    }
+
+    if (maxPrice !== undefined && !isNaN(Number(maxPrice))) {
+      query = query.where('price').lte(Number(maxPrice));
+    }
+
+    const artworks = await query
+      .sort(sortCriteria)
       .skip((page - 1) * limit)
       .limit(Number(limit));
-
-    console.log(`Fetched Artworks: ${artworks.length}`); // Log the number of artworks fetched
 
     const artworksImagesURL = artworks.map((artwork) => {
       const imagesURL = artwork.images.map((image) => ({

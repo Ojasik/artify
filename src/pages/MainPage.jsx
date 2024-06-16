@@ -6,6 +6,7 @@ import { ArtworkCard } from '../components/artwork/ArtworkCard';
 import { useCategory } from '../contexts/CategoryContext';
 import { useLocation } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
+import { InputNumber, Button, Radio } from 'antd';
 
 export const MainPage = () => {
   const { currentUser } = useContext(UserContext);
@@ -16,6 +17,9 @@ export const MainPage = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [initialLoad, setInitialLoad] = useState(true);
+  const [minPrice, setMinPrice] = useState(0); // Default minPrice is 0
+  const [maxPrice, setMaxPrice] = useState(100000); // Default maxPrice is 100000
+  const [sortOrder, setSortOrder] = useState(''); // Default sorting order
 
   const location = useLocation();
 
@@ -51,36 +55,42 @@ export const MainPage = () => {
     }
   };
 
-  const fetchArtworks = async (page, limit = 10) => {
+  const fetchArtworks = async (page, minPrice, maxPrice, sortOrder, limit = 10) => {
     try {
-      const response = await fetch(
-        `http://localhost:8000/api/artworks?page=${page}&limit=${limit}`
-      );
+      let url = `http://localhost:8000/api/artworks?page=${page}&limit=${limit}`;
+
+      if (minPrice !== 0) {
+        url += `&minPrice=${minPrice}`;
+      }
+      if (maxPrice !== 100000) {
+        url += `&maxPrice=${maxPrice}`;
+      }
+      if (sortOrder) {
+        url += `&sortOrder=${sortOrder}`;
+      }
+
+      const response = await fetch(url);
+
       if (response.ok) {
         const artworksData = await response.json();
         console.log(`Fetched Artworks Data:`, artworksData); // Debugging log
         const verifiedArtworks = artworksData.filter((artwork) => artwork.status === 'Verified');
 
-        setArtworks((prevArtworks) => {
-          // Ensure no duplicates
-          const newArtworks = verifiedArtworks.filter(
-            (newArtwork) => !prevArtworks.some((artwork) => artwork._id === newArtwork._id)
-          );
-          return [...prevArtworks, ...newArtworks];
-        });
+        // If it's the first page, reset artworks state
+        if (page === 1) {
+          setArtworks(verifiedArtworks);
+        } else {
+          // Append new artworks to existing artworks state
+          setArtworks((prevArtworks) => {
+            const newArtworks = verifiedArtworks.filter(
+              (newArtwork) => !prevArtworks.some((artwork) => artwork._id === newArtwork._id)
+            );
+            return [...prevArtworks, ...newArtworks];
+          });
+        }
 
         if (verifiedArtworks.length < limit) {
           setHasMore(false);
-        }
-
-        // Check if initial load has insufficient artworks for scrolling
-        if (initialLoad) {
-          setInitialLoad(false);
-          const totalHeight = document.documentElement.scrollHeight;
-          const windowHeight = window.innerHeight;
-          if (totalHeight <= windowHeight) {
-            setPage((prevPage) => prevPage + 1);
-          }
         }
       } else {
         console.error('Failed to fetch artworks');
@@ -91,8 +101,8 @@ export const MainPage = () => {
   };
 
   useEffect(() => {
-    fetchArtworks(page);
-  }, [page]);
+    fetchArtworks(page, minPrice, maxPrice, sortOrder);
+  }, [page, minPrice, maxPrice, sortOrder]);
 
   useEffect(() => {
     console.log(`Artworks State:`, artworks); // Debugging log
@@ -112,51 +122,110 @@ export const MainPage = () => {
     setArtworks([]);
     setPage(1);
     setHasMore(true);
-    fetchArtworks(1); // Refetch first page
+    fetchArtworks(1, minPrice, maxPrice, sortOrder); // Refetch first page
   };
 
-  const filteredArtworks =
-    selectedCategory === 'All'
-      ? artworks.filter((artwork) => artwork.createdBy !== currentUser)
-      : artworks.filter(
-          (artwork) =>
-            artwork.category === selectedCategory &&
-            artwork.createdBy !== currentUser &&
-            artwork.status === 'Verified'
-        );
+  const clearFilters = () => {
+    setMinPrice(0);
+    setMaxPrice(100000);
+    setSortOrder('');
+    setPage(1); // Reset page to 1 when clearing filters
+    setHasMore(true); // Ensure infinite scroll works properly after clearing filters
+    fetchArtworks(1, 0, 100000, ''); // Fetch artworks with default parameters after clearing filters
+  };
+
+  const filteredArtworks = artworks
+    .filter((artwork) =>
+      selectedCategory === 'All'
+        ? artwork.createdBy !== currentUser
+        : artwork.category === selectedCategory &&
+          artwork.createdBy !== currentUser &&
+          artwork.status === 'Verified'
+    )
+    .filter((artwork) => {
+      if (minPrice !== 0 && artwork.price < minPrice) return false;
+      if (maxPrice !== 100000 && artwork.price > maxPrice) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      if (sortOrder === 'asc') {
+        return a.price - b.price;
+      } else if (sortOrder === 'desc') {
+        return b.price - a.price;
+      } else {
+        // Default sorting by createdAt date (backend handles this)
+        return 0; // No additional sorting needed on frontend
+      }
+    });
 
   return (
     <>
       <Navbar onArtworkUpdate={handleArtworkUpdate} />
 
-      <InfiniteScroll
-        dataLength={artworks.length}
-        next={() => setPage((prevPage) => prevPage + 1)}
-        hasMore={hasMore}
-        loader={<h4>Loading...</h4>}
-        endMessage={
-          <p style={{ textAlign: 'center' }}>
-            <b>Yay! You have seen it all</b>
-          </p>
-        }>
-        <div className="m-auto grid max-w-screen-2xl grid-cols-1 gap-4 p-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {filteredArtworks.map((artwork) => (
-            <ArtworkCard
-              key={artwork._id}
-              artwork={artwork}
-              handleReadMore={handleReadMore}
-              showBuyButton={true}
-              addToCart={addToCart}
-            />
-          ))}
+      <div className="m-auto max-w-screen-2xl">
+        <div className="pl-6 pt-6">
+          <InputNumber
+            placeholder="Min Price"
+            min={0}
+            max={100000}
+            value={minPrice}
+            onChange={(value) => setMinPrice(value)}
+            style={{ marginRight: '10px' }}
+          />
+          <InputNumber
+            placeholder="Max Price"
+            min={0}
+            max={100000}
+            value={maxPrice}
+            onChange={(value) => setMaxPrice(value)}
+            style={{ marginRight: '10px' }}
+          />
+          <Radio.Group
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            style={{ marginRight: '10px' }}>
+            <Radio.Button value="asc">Asc</Radio.Button>
+            <Radio.Button value="desc">Desc</Radio.Button>
+          </Radio.Group>
+          <Button
+            type="primary"
+            onClick={clearFilters}
+            className="rounded-md bg-red-500 px-8 py-1 text-white">
+            Clear Filters
+          </Button>
         </div>
-      </InfiniteScroll>
 
-      <ArtworkDetailModal
-        isOpen={isDetailsModalOpen}
-        onClose={handleDetailsModalClose}
-        artworkDetails={selectedArtworkDetails || {}}
-      />
+        <InfiniteScroll
+          dataLength={artworks.length}
+          next={() => setPage((prevPage) => prevPage + 1)}
+          hasMore={hasMore}
+          loader={<h4>Loading...</h4>}
+          endMessage={
+            <p className="pb-6 text-center">
+              <b>Yay! You have seen it all</b>
+            </p>
+          }>
+          <div className="m-auto grid max-w-screen-2xl grid-cols-1 gap-4 p-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {filteredArtworks.map((artwork) => (
+              <ArtworkCard
+                key={artwork._id}
+                artwork={artwork}
+                handleReadMore={handleReadMore}
+                showBuyButton={true}
+                addToCart={addToCart}
+              />
+            ))}
+          </div>
+        </InfiniteScroll>
+
+        <ArtworkDetailModal
+          isOpen={isDetailsModalOpen}
+          onClose={handleDetailsModalClose}
+          artworkDetails={selectedArtworkDetails || {}}
+        />
+      </div>
     </>
   );
 };
+
+export default MainPage;
