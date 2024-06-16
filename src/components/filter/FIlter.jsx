@@ -37,6 +37,7 @@ const Filter = ({
             <Option value="Uploaded">Uploaded</Option>
             <Option value="Verified">Verified</Option>
             <Option value="Sold">Sold</Option>
+            <Option value="Rejected">Rejected</Option>
           </Select>
         )}
         <Select

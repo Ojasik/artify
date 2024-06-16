@@ -6,7 +6,8 @@ import { ArtworkCard } from '../components/artwork/ArtworkCard';
 import { useCategory } from '../contexts/CategoryContext';
 import { useLocation } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
-import { InputNumber, Button, Radio } from 'antd';
+import { InputNumber, Button, Select } from 'antd';
+const { Option } = Select;
 
 export const MainPage = () => {
   const { currentUser } = useContext(UserContext);
@@ -19,7 +20,7 @@ export const MainPage = () => {
   const [initialLoad, setInitialLoad] = useState(true);
   const [minPrice, setMinPrice] = useState(0); // Default minPrice is 0
   const [maxPrice, setMaxPrice] = useState(100000); // Default maxPrice is 100000
-  const [sortOrder, setSortOrder] = useState(''); // Default sorting order
+  const [sortOrder, setSortOrder] = useState(); // Default sorting order
 
   const location = useLocation();
 
@@ -128,7 +129,7 @@ export const MainPage = () => {
   const clearFilters = () => {
     setMinPrice(0);
     setMaxPrice(100000);
-    setSortOrder('');
+    setSortOrder();
     setPage(1); // Reset page to 1 when clearing filters
     setHasMore(true); // Ensure infinite scroll works properly after clearing filters
     fetchArtworks(1, 0, 100000, ''); // Fetch artworks with default parameters after clearing filters
@@ -163,14 +164,13 @@ export const MainPage = () => {
       <Navbar onArtworkUpdate={handleArtworkUpdate} />
 
       <div className="m-auto max-w-screen-2xl">
-        <div className="pl-6 pt-6">
+        <div className="space-x-4 pl-8 pt-6">
           <InputNumber
             placeholder="Min Price"
             min={0}
             max={100000}
             value={minPrice}
             onChange={(value) => setMinPrice(value)}
-            style={{ marginRight: '10px' }}
           />
           <InputNumber
             placeholder="Max Price"
@@ -178,17 +178,17 @@ export const MainPage = () => {
             max={100000}
             value={maxPrice}
             onChange={(value) => setMaxPrice(value)}
-            style={{ marginRight: '10px' }}
           />
-          <Radio.Group
+          <Select
             value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            style={{ marginRight: '10px' }}>
-            <Radio.Button value="asc">Asc</Radio.Button>
-            <Radio.Button value="desc">Desc</Radio.Button>
-          </Radio.Group>
+            placeholder="Sort by price"
+            onChange={(value) => setSortOrder(value)}
+            className="">
+            <Option value="asc">Asc</Option>
+            <Option value="desc">Desc</Option>
+          </Select>
           <Button
-            type="primary"
+            type="danger"
             onClick={clearFilters}
             className="rounded-md bg-red-500 px-8 py-1 text-white">
             Clear Filters
@@ -199,7 +199,7 @@ export const MainPage = () => {
           dataLength={artworks.length}
           next={() => setPage((prevPage) => prevPage + 1)}
           hasMore={hasMore}
-          loader={<h4>Loading...</h4>}
+          loader={<h4 className="pl-8">Loading...</h4>}
           endMessage={
             <p className="pb-6 text-center">
               <b>Yay! You have seen it all</b>
