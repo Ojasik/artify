@@ -159,26 +159,36 @@ export const MainPage = () => {
       }
     });
 
+  // Determine if there are no artworks to display after filtering
+  const noArtworksToDisplay = artworks.length > 0 && filteredArtworks.length === 0;
+
   return (
     <>
       <Navbar onArtworkUpdate={handleArtworkUpdate} />
 
       <div className="m-auto max-w-screen-2xl">
-        <div className="space-x-4 pl-8 pt-6">
-          <InputNumber
-            placeholder="Min Price"
-            min={0}
-            max={100000}
-            value={minPrice}
-            onChange={(value) => setMinPrice(value)}
-          />
-          <InputNumber
-            placeholder="Max Price"
-            min={0}
-            max={100000}
-            value={maxPrice}
-            onChange={(value) => setMaxPrice(value)}
-          />
+        <div className="flex space-x-4 pl-8 pt-6">
+          <div className="flex items-center gap-2">
+            <InputNumber
+              placeholder="Min Price"
+              addonAfter="€"
+              min={0}
+              max={100000}
+              value={minPrice}
+              onChange={(value) => setMinPrice(value)}
+              className="w-32"
+            />
+            <div className="w-4 border-b border-gray-300"></div>
+            <InputNumber
+              placeholder="Max Price"
+              addonAfter="€"
+              min={0}
+              max={100000}
+              value={maxPrice}
+              onChange={(value) => setMaxPrice(value)}
+              className="w-32"
+            />
+          </div>
           <Select
             value={sortOrder}
             placeholder="Sort by price"
@@ -196,14 +206,18 @@ export const MainPage = () => {
         </div>
 
         <InfiniteScroll
-          dataLength={artworks.length}
+          dataLength={filteredArtworks.length}
           next={() => setPage((prevPage) => prevPage + 1)}
-          hasMore={hasMore}
+          hasMore={hasMore && !noArtworksToDisplay} // Adjusted hasMore based on noArtworksToDisplay
           loader={<h4 className="pl-8">Loading...</h4>}
           endMessage={
-            <p className="pb-6 text-center">
-              <b>Yay! You have seen it all</b>
-            </p>
+            noArtworksToDisplay ? (
+              <p className="pb-6 text-center">No artworks to display</p>
+            ) : (
+              <p className="pb-6 text-center">
+                <b>Yay! You have seen it all</b>
+              </p>
+            )
           }>
           <div className="m-auto grid max-w-screen-2xl grid-cols-1 gap-4 p-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {filteredArtworks.map((artwork) => (
