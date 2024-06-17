@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Modal, Image } from 'antd';
 import { UserContext } from '../../contexts/UserContext';
-import RejectionDrawer from '../RejectionDrawer';
+import RejectionDrawer from '../common/RejectionDrawer';
 import moment from 'moment';
 
 const getImageContainerClass = (numImages) => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Navbar } from '../common/Navbar';
 import { useParams } from 'react-router-dom';
-import { EditModal } from '../EditModal';
+import { EditModal } from './EditModal';
 import { ArtworkDetailModal } from '../artwork/ArtworkDetailModal';
 import { UserCard } from './UserCard';
 import ProfilePagesLinks from './ProfilePageLinks';
