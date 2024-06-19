@@ -1,6 +1,10 @@
 {
   "name": "artify",
   "version": "0.1.0",
+  "engines": {
+    "node": "18.x",
+    "npm": "10.x"
+  },
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -61,7 +65,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "devStart": "nodemon server.js",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install npm && run build"
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run build"
   },
   "browserslist": {
     "production": [
