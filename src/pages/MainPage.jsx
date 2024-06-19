@@ -7,6 +7,7 @@ import { useCategory } from '../contexts/CategoryContext';
 import { useLocation } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 import { InputNumber, Button, Select } from 'antd';
+import Footer from '../components/common/Footer';
 const { Option } = Select;
 
 export const MainPage = () => {
@@ -238,6 +239,7 @@ export const MainPage = () => {
           artworkDetails={selectedArtworkDetails || {}}
         />
       </div>
+      <Footer />
     </>
   );
 };

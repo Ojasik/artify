@@ -36,14 +36,24 @@ export const ArtworkCard = ({
   addToCart
 }) => {
   const { currentUser } = useContext(UserContext);
-  const handleAddToCart = () => {
-    addToCart(artwork._id); // Call the addToCart function with artwork ID as parameter
-  };
-
   const navigate = useNavigate();
 
+  const handleAddToCart = () => {
+    if (!currentUser) {
+      navigate('/login');
+    } else {
+      addToCart(artwork._id); // Call the addToCart function with artwork ID as parameter
+    }
+  };
+
   const handleBuyNow = () => {
-    navigate(`/order/${artwork._id}`, { state: { artworks: [artwork] } });
+    if (!currentUser) {
+      // If user is not logged in, redirect to login page
+      navigate('/login');
+    } else {
+      // If logged in, navigate to the order page with artwork data
+      navigate(`/order/${artwork._id}`, { state: { artworks: [artwork] } });
+    }
   };
 
   const isEditable =

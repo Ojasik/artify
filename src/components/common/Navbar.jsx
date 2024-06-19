@@ -47,6 +47,16 @@ export const Navbar = ({ onArtworkUpdate }) => {
     }
   };
 
+  const handleSellItemsClick = () => {
+    if (!currentUser) {
+      // If user is not logged in, redirect to login page
+      navigate('/login');
+    } else {
+      // Handle logic for selling items
+      openAddArtworkModal();
+    }
+  };
+
   return (
     <Disclosure>
       {({ open }) => (
@@ -157,7 +167,7 @@ export const Navbar = ({ onArtworkUpdate }) => {
               <div className="flex items-center space-x-4">
                 <button
                   type="button"
-                  onClick={openAddArtworkModal}
+                  onClick={handleSellItemsClick}
                   className="rounded-full border border-mainColor px-3 font-semibold text-black transition-colors duration-300 hover:bg-mainColor hover:text-white">
                   Sell items
                 </button>

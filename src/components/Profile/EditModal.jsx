@@ -1,82 +1,83 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { CloseOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 export const EditModal = ({ isOpen, onClose, onProfileUpdate, initialProfileData }) => {
   const cancelButtonRef = useRef(null);
   const fileInputRef = useRef(null);
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    description: '',
-    website: '',
-    x: '',
-    instagram: '',
-    facebook: '',
-    avatar: ''
+
+  // Define validation schema using Yup
+  const validationSchema = Yup.object().shape({
+    firstName: Yup.string().required('First Name is required'),
+    lastName: Yup.string().required('Last Name is required'),
+    description: Yup.string(),
+    website: Yup.string().matches(
+      /^(www\.)?[a-zA-Z0-9]+\.[a-zA-Z]{2,}$/,
+      'Website must be in the format www.example.com'
+    ),
+    x: Yup.string(),
+    instagram: Yup.string(),
+    facebook: Yup.string(),
+    avatar: Yup.string()
   });
 
-  useEffect(() => {
-    // Set the form data with initial profile data when the modal opens
-    setFormData({
-      firstName: initialProfileData.firstname || '',
-      lastName: initialProfileData.lastname || '',
-      description: initialProfileData.description || '',
-      website: initialProfileData.website || '',
-      x: initialProfileData.x || '',
-      instagram: initialProfileData.instagram || '',
-      facebook: initialProfileData.facebook || '',
-      avatar: initialProfileData.avatar || ''
-    });
-  }, [initialProfileData]);
+  // Initialize Formik
+  const formik = useFormik({
+    initialValues: {
+      firstName: initialProfileData?.firstname || '',
+      lastName: initialProfileData?.lastname || '',
+      description: initialProfileData?.description || '',
+      website: initialProfileData?.website || '',
+      x: initialProfileData?.x || '',
+      instagram: initialProfileData?.instagram || '',
+      facebook: initialProfileData?.facebook || '',
+      avatar: initialProfileData?.avatar || ''
+    },
+    validationSchema,
+    onSubmit: async (values) => {
+      try {
+        const response = await fetch('http://localhost:8000/api/users/profile', {
+          method: 'PUT',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(values)
+        });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+        if (response.ok) {
+          const responseData = await response.json();
+          console.log('Profile updated successfully');
+          onProfileUpdate();
+          onClose();
+        } else {
+          console.error('Failed to update profile');
+        }
+      } catch (error) {
+        console.error('Error during profile update:', error);
+      }
+    }
+  });
 
+  // Handle file input change
   const handleFileInputChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData({ ...formData, avatar: reader.result });
+        formik.setFieldValue('avatar', reader.result);
       };
       reader.readAsDataURL(file);
-    }
-  };
-
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      const response = await fetch('http://localhost:8000/api/users/profile', {
-        method: 'PUT',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
-
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log('Profile updated successfully');
-        onProfileUpdate();
-        onClose();
-      } else {
-        console.error('Failed to update profile');
-      }
-    } catch (error) {
-      console.error('Error during profile update:', error);
     }
   };
 
   return (
     <Modal
       title="Edit profile"
-      open={isOpen}
+      visible={isOpen}
       onCancel={onClose}
       maskClosable={false}
       footer={[
@@ -90,11 +91,11 @@ export const EditModal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
         <button
           key="save"
           className="inline-flex w-full justify-center rounded-full bg-mainColor px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-hoverColor sm:ml-3 sm:w-auto"
-          onClick={handleFormSubmit}>
+          onClick={formik.handleSubmit}>
           Save
         </button>
       ]}>
-      <form id="editProfileForm" onSubmit={handleFormSubmit}>
+      <form onSubmit={formik.handleSubmit}>
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col items-start pb-4">
             <label htmlFor="firstName" className="block pl-4 text-sm font-medium text-mainColor">
@@ -105,11 +106,18 @@ export const EditModal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
               id="firstName"
               name="firstName"
               placeholder="First Name"
-              value={formData.firstName}
-              onChange={handleInputChange}
-              className="w-full rounded-full border border-black p-2 px-4"
-              required
+              value={formik.values.firstName}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              className={`w-full rounded-full border ${
+                formik.touched.firstName && formik.errors.firstName
+                  ? 'border-red-500'
+                  : 'border-black'
+              } p-2 px-4`}
             />
+            {formik.touched.firstName && formik.errors.firstName && (
+              <div className="text-red-500">{formik.errors.firstName}</div>
+            )}
           </div>
           <div className="flex flex-col items-start pb-4">
             <label htmlFor="lastName" className="block pl-4 text-sm font-medium text-mainColor">
@@ -118,15 +126,21 @@ export const EditModal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
             <input
               type="text"
               id="lastName"
-              placeholder="Last Name"
               name="lastName"
-              value={formData.lastName}
-              onChange={handleInputChange}
-              className="w-full rounded-full border border-black p-2 px-4"
-              required
+              placeholder="Last Name"
+              value={formik.values.lastName}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              className={`w-full rounded-full border ${
+                formik.touched.lastName && formik.errors.lastName
+                  ? 'border-red-500'
+                  : 'border-black'
+              } p-2 px-4`}
             />
+            {formik.touched.lastName && formik.errors.lastName && (
+              <div className="text-red-500">{formik.errors.lastName}</div>
+            )}
           </div>
-
           <div className="flex flex-col items-start pb-4">
             <label htmlFor="website" className="block pl-4 text-sm font-medium text-mainColor">
               Website
@@ -135,11 +149,14 @@ export const EditModal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
               type="text"
               id="website"
               name="website"
-              value={formData.website}
-              onChange={handleInputChange}
+              value={formik.values.website}
+              onChange={formik.handleChange}
               className="w-full rounded-full border border-black p-2 px-4"
               placeholder="Website (optional)"
             />
+            {formik.touched.website && formik.errors.website ? (
+              <div className="text-red-500">{formik.errors.website}</div>
+            ) : null}
           </div>
           <div className="flex flex-col items-start pb-4">
             <label htmlFor="x" className="block pl-4 text-sm font-medium text-mainColor">
@@ -149,8 +166,8 @@ export const EditModal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
               type="text"
               id="x"
               name="x"
-              value={formData.x}
-              onChange={handleInputChange}
+              value={formik.values.x}
+              onChange={formik.handleChange}
               className="w-full rounded-full border border-black p-2 px-4"
               placeholder="X (optional)"
             />
@@ -163,8 +180,8 @@ export const EditModal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
               type="text"
               id="instagram"
               name="instagram"
-              value={formData.instagram}
-              onChange={handleInputChange}
+              value={formik.values.instagram}
+              onChange={formik.handleChange}
               className="w-full rounded-full border border-black p-2 px-4"
               placeholder="Instagram (optional)"
             />
@@ -177,8 +194,8 @@ export const EditModal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
               type="text"
               id="facebook"
               name="facebook"
-              value={formData.facebook}
-              onChange={handleInputChange}
+              value={formik.values.facebook}
+              onChange={formik.handleChange}
               className="w-full rounded-full border border-black p-2 px-4"
               placeholder="Facebook (optional)"
             />
@@ -190,18 +207,18 @@ export const EditModal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
             <textarea
               id="description"
               name="description"
-              value={formData.description}
-              onChange={handleInputChange}
+              value={formik.values.description}
+              onChange={formik.handleChange}
               className="w-full rounded-2xl border border-black p-2 px-4"
               placeholder="Description (optional)"
             />
           </div>
           <div className="col-span-2">
             <div className="flex flex-col items-center justify-center">
-              {formData.avatar && (
+              {formik.values.avatar && (
                 <span className="h-36 w-36 overflow-hidden rounded-full bg-gray-200">
                   <img
-                    src={formData.avatar}
+                    src={formik.values.avatar}
                     alt="Profile Icon"
                     className="h-full w-full object-cover"
                   />
@@ -212,13 +229,13 @@ export const EditModal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
                       onClick={() => fileInputRef.current.click()}>
                       Upload Image
                     </button>
-                    {formData.avatar && (
+                    {formik.values.avatar && (
                       <button
                         type="button"
                         className="ml-2 inline-flex items-center justify-center rounded-full bg-red-500 px-2 py-1 text-sm font-semibold text-white shadow-sm hover:bg-red-600"
                         style={{ width: '28px', height: '28px' }}
-                        onClick={() => setFormData({ ...formData, avatar: '' })}>
-                        <CloseOutlined style={{ fontSize: '16px' }} />{' '}
+                        onClick={() => formik.setFieldValue('avatar', '')}>
+                        <CloseOutlined style={{ fontSize: '16px' }} />
                       </button>
                     )}
                   </div>
@@ -231,12 +248,12 @@ export const EditModal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
                   onClick={() => fileInputRef.current.click()}>
                   Upload Image
                 </button>
-                {formData.avatar && (
+                {formik.values.avatar && (
                   <button
                     type="button"
                     className="ml-2 inline-flex items-center justify-center rounded-full bg-red-500 px-2 py-1 text-sm font-semibold text-white shadow-sm hover:bg-red-600"
                     style={{ width: '28px', height: '28px' }}
-                    onClick={() => setFormData({ ...formData, avatar: '' })}>
+                    onClick={() => formik.setFieldValue('avatar', '')}>
                     <CloseOutlined style={{ fontSize: '16px' }} />
                   </button>
                 )}

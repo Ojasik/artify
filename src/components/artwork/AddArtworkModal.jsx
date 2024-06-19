@@ -99,6 +99,8 @@ export const AddArtworkModal = ({ isOpen, onClose, onArtworkUpdate }) => {
           resetForm();
           setImages([]);
           onClose();
+
+          message.success('Artwork added successfully');
         } else {
           console.error('Failed to add artwork');
         }
@@ -185,11 +187,12 @@ export const AddArtworkModal = ({ isOpen, onClose, onArtworkUpdate }) => {
         className="flex flex-col items-center gap-4"
         onSubmit={formik.handleSubmit}>
         <div>
+          <label className="block pl-4 text-sm font-medium text-mainColor">Title</label>
           <input
             type="text"
             name="title"
             placeholder="Title"
-            className={`mt-4 w-80 rounded-full border border-black p-2 px-4 ${
+            className={`w-80 rounded-full border border-black p-2 px-4 ${
               formik.touched.title && formik.errors.title ? 'border-red-500' : 'border-black'
             }`}
             value={formik.values.title}
@@ -202,6 +205,7 @@ export const AddArtworkModal = ({ isOpen, onClose, onArtworkUpdate }) => {
           ) : null}
         </div>
         <div>
+          <label className="block pl-4 text-sm font-medium text-mainColor">Price</label>
           <input
             type="number"
             placeholder="Price"
@@ -233,44 +237,52 @@ export const AddArtworkModal = ({ isOpen, onClose, onArtworkUpdate }) => {
             <span>€{netEarnings.toFixed(2)}</span>
           </div>
         </div>
-        <select
-          name="category"
-          value={formik.values.category}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          className="w-80 rounded-full border border-black p-2 px-4">
-          <option value="Painting">Painting</option>
-          <option value="Sculpture">Sculpture</option>
-          <option value="Literature">Literature</option>
-        </select>
-        {formik.touched.category && formik.errors.category ? (
-          <div className="text-red-500">{formik.errors.category}</div>
-        ) : null}
-        <textarea
-          name="about"
-          className="w-80 rounded-2xl border border-black p-2 px-4"
-          placeholder="About"
-          value={formik.values.about}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          required
-        />
-        <input
-          type="number"
-          placeholder="Weight (kg)"
-          name="weight"
-          className={`w-80 rounded-full border border-black p-2 px-4 ${
-            formik.touched.weight && formik.errors.weight ? 'border-red-500' : 'border-black'
-          }`}
-          value={formik.values.weight}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          required
-        />
-        {formik.touched.weight && formik.errors.weight ? (
-          <div className="text-red-500">{formik.errors.weight}</div>
-        ) : null}
-
+        <div>
+          <label className="block pl-4 text-sm font-medium text-mainColor">Category</label>
+          <select
+            name="category"
+            value={formik.values.category}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className="w-80 rounded-full border border-black p-2 px-4">
+            <option value="Painting">Painting</option>
+            <option value="Sculpture">Sculpture</option>
+            <option value="Literature">Literature</option>
+          </select>
+          {formik.touched.category && formik.errors.category ? (
+            <div className="text-red-500">{formik.errors.category}</div>
+          ) : null}
+        </div>
+        <div>
+          <label className="block pl-4 text-sm font-medium text-mainColor">Description</label>
+          <textarea
+            name="about"
+            className="w-80 rounded-2xl border border-black p-2 px-4"
+            placeholder="About"
+            value={formik.values.about}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            required
+          />
+        </div>
+        <div>
+          <label className="block pl-4 text-sm font-medium text-mainColor">Weight and size</label>
+          <input
+            type="number"
+            placeholder="Weight (kg)"
+            name="weight"
+            className={`w-80 rounded-full border border-black p-2 px-4 ${
+              formik.touched.weight && formik.errors.weight ? 'border-red-500' : 'border-black'
+            }`}
+            value={formik.values.weight}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            required
+          />
+          {formik.touched.weight && formik.errors.weight ? (
+            <div className="text-red-500">{formik.errors.weight}</div>
+          ) : null}
+        </div>
         <div className="flex w-4/5 gap-4">
           <input
             type="number"

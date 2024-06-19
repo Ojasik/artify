@@ -1,39 +1,57 @@
 import React, { useRef, useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Modal } from 'antd';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
 import { UserContext } from '../../contexts/UserContext';
 
 const AddressEditModal = ({ isOpen, onClose }) => {
   const cancelButtonRef = useRef(null);
   const [countries, setCountries] = useState([]);
-  const [formData, setFormData] = useState({
-    address: '',
-    city: '',
-    postalCode: '',
-    country: '',
-    apartment: ''
-  });
   const { userId } = useContext(UserContext);
 
+  // Yup validation schema
+  const validationSchema = yup.object({
+    address: yup.string().required('Address is required'),
+    city: yup.string().required('City is required'),
+    postalCode: yup.string().required('Postal Code is required'),
+    country: yup.string().required('Country is required'),
+    apartment: yup.string().optional()
+  });
+
+  // Formik initialization
+  const formik = useFormik({
+    initialValues: {
+      address: '',
+      city: '',
+      postalCode: '',
+      country: '',
+      apartment: ''
+    },
+    validationSchema: validationSchema,
+    onSubmit: async (values) => {
+      try {
+        const response = await fetch('http://localhost:8000/api/users/add-address', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ ...values, userId })
+        });
+        if (response.ok) {
+          onClose();
+        } else {
+          console.error('Failed to add address');
+        }
+      } catch (error) {
+        console.error('Error adding address:', error);
+      }
+    }
+  });
+
   useEffect(() => {
-    fetchAddress();
     fetchCountries();
   }, []);
-
-  const fetchAddress = async () => {
-    try {
-      const response = await fetch(`http://localhost:8000/api/users/${userId}/address`);
-      if (response.ok) {
-        const addressData = await response.json();
-        setFormData(addressData);
-        console.log(addressData);
-      } else {
-        console.error('Failed to fetch address');
-      }
-    } catch (error) {
-      console.error('Error fetching address:', error);
-    }
-  };
 
   const fetchCountries = async () => {
     try {
@@ -47,31 +65,6 @@ const AddressEditModal = ({ isOpen, onClose }) => {
       }
     } catch (error) {
       console.error('Error fetching countries:', error);
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch('http://localhost:8000/api/users/add-address', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ ...formData, userId })
-      });
-      if (response.ok) {
-        onClose();
-      } else {
-        console.error('Failed to add address');
-      }
-    } catch (error) {
-      console.error('Error adding address:', error);
     }
   };
 
@@ -91,11 +84,11 @@ const AddressEditModal = ({ isOpen, onClose }) => {
         <button
           key="save"
           className="inline-flex w-full justify-center rounded-full bg-mainColor px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-hoverColor sm:ml-3 sm:w-auto"
-          onClick={handleFormSubmit}>
+          onClick={formik.handleSubmit}>
           Save
         </button>
       ]}>
-      <form onSubmit={handleFormSubmit} className="grid grid-cols-2 gap-4">
+      <form onSubmit={formik.handleSubmit} className="grid grid-cols-2 gap-4">
         <div className="flex flex-col items-start pb-4">
           <label htmlFor="address" className="block pl-4 text-sm font-medium text-mainColor">
             Address
@@ -104,12 +97,17 @@ const AddressEditModal = ({ isOpen, onClose }) => {
             type="text"
             id="address"
             name="address"
-            value={formData.address}
-            onChange={handleInputChange}
-            className="w-full rounded-full border border-black p-2 px-4"
-            placeholder="Address"
+            value={formik.values.address}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className={`w-full rounded-full border p-2 px-4 ${
+              formik.touched.address && formik.errors.address ? 'border-red-500' : 'border-black'
+            }`}
             required
           />
+          {formik.touched.address && formik.errors.address ? (
+            <div className="text-red-500">{formik.errors.address}</div>
+          ) : null}
         </div>
         <div className="flex flex-col items-start pb-4">
           <label htmlFor="city" className="block pl-4 text-sm font-medium text-mainColor">
@@ -119,12 +117,17 @@ const AddressEditModal = ({ isOpen, onClose }) => {
             type="text"
             id="city"
             name="city"
-            value={formData.city}
-            onChange={handleInputChange}
-            className="w-full rounded-full border border-black p-2 px-4"
-            placeholder="City"
+            value={formik.values.city}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className={`w-full rounded-full border p-2 px-4 ${
+              formik.touched.city && formik.errors.city ? 'border-red-500' : 'border-black'
+            }`}
             required
           />
+          {formik.touched.city && formik.errors.city ? (
+            <div className="text-red-500">{formik.errors.city}</div>
+          ) : null}
         </div>
         <div className="flex flex-col items-start pb-4">
           <label htmlFor="postalCode" className="block pl-4 text-sm font-medium text-mainColor">
@@ -134,12 +137,19 @@ const AddressEditModal = ({ isOpen, onClose }) => {
             type="text"
             id="postalCode"
             name="postalCode"
-            value={formData.postalCode}
-            onChange={handleInputChange}
-            className="w-full rounded-full border border-black p-2 px-4"
-            placeholder="Postal Code"
+            value={formik.values.postalCode}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className={`w-full rounded-full border p-2 px-4 ${
+              formik.touched.postalCode && formik.errors.postalCode
+                ? 'border-red-500'
+                : 'border-black'
+            }`}
             required
           />
+          {formik.touched.postalCode && formik.errors.postalCode ? (
+            <div className="text-red-500">{formik.errors.postalCode}</div>
+          ) : null}
         </div>
         <div className="flex flex-col items-start pb-4">
           <label htmlFor="country" className="block pl-4 text-sm font-medium text-mainColor">
@@ -148,9 +158,12 @@ const AddressEditModal = ({ isOpen, onClose }) => {
           <select
             id="country"
             name="country"
-            value={formData.country}
-            onChange={handleInputChange}
-            className="w-full rounded-full border border-black p-2 px-4"
+            value={formik.values.country}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className={`w-full rounded-full border p-2 px-4 ${
+              formik.touched.country && formik.errors.country ? 'border-red-500' : 'border-black'
+            }`}
             required>
             <option value="" disabled>
               Select Country
@@ -161,6 +174,9 @@ const AddressEditModal = ({ isOpen, onClose }) => {
               </option>
             ))}
           </select>
+          {formik.touched.country && formik.errors.country ? (
+            <div className="text-red-500">{formik.errors.country}</div>
+          ) : null}
         </div>
         <div className="flex flex-col items-start pb-4">
           <label htmlFor="apartment" className="block pl-4 text-sm font-medium text-mainColor">
@@ -170,11 +186,18 @@ const AddressEditModal = ({ isOpen, onClose }) => {
             type="text"
             id="apartment"
             name="apartment"
-            value={formData.apartment}
-            onChange={handleInputChange}
-            className="w-full rounded-full border border-black p-2 px-4"
-            placeholder="Apartment"
+            value={formik.values.apartment}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className={`w-full rounded-full border p-2 px-4 ${
+              formik.touched.apartment && formik.errors.apartment
+                ? 'border-red-500'
+                : 'border-black'
+            }`}
           />
+          {formik.touched.apartment && formik.errors.apartment ? (
+            <div className="text-red-500">{formik.errors.apartment}</div>
+          ) : null}
         </div>
       </form>
     </Modal>

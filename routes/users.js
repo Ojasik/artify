@@ -439,4 +439,39 @@ router.get('/:userId/address', async (req, res) => {
   }
 });
 
+router.post('/change-password', authenticateJWT, async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  try {
+    // Ensure req.user is set by the authenticateJWT middleware
+    if (!req.user || !req.user.userId) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    // Get user from database
+    const user = await User.findById(req.user.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check if old password is correct
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Old password is incorrect' });
+    }
+
+    // Update user's password (pre-save middleware will hash it)
+    user.password = newPassword;
+
+    // Save updated user
+    await user.save();
+
+    res.json({ message: 'Password changed successfully' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
 module.exports = router;

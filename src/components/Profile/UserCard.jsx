@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react';
+import { message } from 'antd';
 import { SettingOutlined, CarOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXTwitter, faInstagram, faFacebookF } from '@fortawesome/free-brands-svg-icons';
@@ -11,7 +12,6 @@ import BankDetailsModal from './BankDetailsModal';
 import Avatar from '../common/Avatar';
 export const UserCard = ({ userProfile, openEditModal }) => {
   const { currentUser } = useContext(UserContext);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [isBankModalOpen, setIsBankModalOpen] = useState(false);
 
@@ -21,6 +21,35 @@ export const UserCard = ({ userProfile, openEditModal }) => {
 
   const openBankModal = () => {
     setIsBankModalOpen(true);
+  };
+
+  const handlePasswordChangeSubmit = async (passwordDetails) => {
+    try {
+      console.log(passwordDetails);
+      const response = await fetch('http://localhost:8000/api/users/change-password', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(passwordDetails)
+      });
+
+      if (response.ok) {
+        console.log('Password changed successfully');
+        setIsBankModalOpen(false);
+        message.success('Password changed successfully'); // Show success message
+      } else if (response.status === 400) {
+        const data = await response.json();
+        message.error(data.message); // Show error message if old password is incorrect
+      } else {
+        console.error('Failed to change password:', response.statusText);
+        message.error('Failed to change password'); // Show generic error message
+      }
+    } catch (error) {
+      console.error('Error changing password:', error);
+      message.error('Error changing password'); // Show error message for unexpected errors
+    }
   };
 
   // Really this data are not used, in backend there are data for testing provided by Stripe
@@ -109,6 +138,7 @@ export const UserCard = ({ userProfile, openEditModal }) => {
         isOpen={isBankModalOpen}
         onClose={() => setIsBankModalOpen(false)}
         onBankDetailsSubmit={handleBankDetailsSubmit}
+        onChangePasswordSubmit={handlePasswordChangeSubmit}
       />
     </div>
   );

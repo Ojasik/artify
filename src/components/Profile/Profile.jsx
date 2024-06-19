@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import Footer from '../common/Footer';
 import { Navbar } from '../common/Navbar';
 import { useParams } from 'react-router-dom';
 import { EditModal } from './EditModal';
@@ -332,6 +333,7 @@ export const Profile = () => {
         artwork={selectedArtworkForEdit || {}}
         updateArtworks={handleArtworkUpdate}
       />
+      <Footer />
     </>
   );
 };
