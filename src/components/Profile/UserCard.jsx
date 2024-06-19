@@ -68,7 +68,7 @@ export const UserCard = ({ userProfile, openEditModal }) => {
 
       if (response.ok) {
         console.log('Bank details saved successfully');
-
+        message.success('Bank details saved successfully');
         setIsBankModalOpen(false);
       } else {
         console.error('Failed to save bank details:', response.statusText);

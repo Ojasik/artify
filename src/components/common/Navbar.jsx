@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 import { Disclosure } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
 import { AddArtworkModal } from '../artwork/AddArtworkModal';
+import { message } from 'antd';
 import Cart from '../Cart';
 
 // Array with categories buttons (TEST)
@@ -30,9 +31,30 @@ export const Navbar = ({ onArtworkUpdate }) => {
   const { currentUser, role } = useContext(UserContext);
   const { selectedCategory, setSelectedCategory } = useCategory();
   const [cartVisible, setCartVisible] = useState(false);
+  const [stripeAccountId, setStripeAccountId] = useState(null); // State to store stripeAccountId
 
   const location = useLocation();
   const navigate = useNavigate();
+
+  const fetchStripeAccountId = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/users/get-stripe-account-id', {
+        credentials: 'include'
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setStripeAccountId(data.stripeAccountId);
+        return data.stripeAccountId;
+      } else {
+        message.error('Failed to fetch Stripe account ID');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching Stripe account ID:', error);
+      message.error('Error fetching Stripe account ID');
+      return null;
+    }
+  };
 
   const openAddArtworkModal = () => {
     setIsAddArtworkModalOpen(true);
@@ -47,13 +69,20 @@ export const Navbar = ({ onArtworkUpdate }) => {
     }
   };
 
-  const handleSellItemsClick = () => {
+  const handleSellItemsClick = async () => {
     if (!currentUser) {
       // If user is not logged in, redirect to login page
       navigate('/login');
     } else {
-      // Handle logic for selling items
-      openAddArtworkModal();
+      // Fetch stripeAccountId if it's not already fetched
+      const id = stripeAccountId || (await fetchStripeAccountId());
+      if (!id) {
+        // Show notification if stripeAccountId is missing
+        message.warning('You need to link your Stripe account before you can sell items.');
+      } else {
+        // Open the Add Artwork Modal if stripeAccountId is present
+        openAddArtworkModal();
+      }
     }
   };
 

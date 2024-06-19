@@ -57,13 +57,13 @@ const UserProvider = ({ children }) => {
   return (
     <UserContext.Provider
       value={{
-        currentUser: userData.username,
-        role: userData.role,
-        userId: userData.userId,
-        firstname: userData.firstname,
-        lastname: userData.lastname,
-        phone: userData.phone,
-        email: userData.email,
+        currentUser: userData?.username,
+        role: userData?.role,
+        userId: userData?.userId,
+        firstname: userData?.firstname,
+        lastname: userData?.lastname,
+        phone: userData?.phone,
+        email: userData?.email,
         handleLogin,
         updateCurrentUser,
         Logout

@@ -8,6 +8,7 @@ const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artworks 
   const [shippingCost, setShippingCost] = useState(0);
   const { userId, firstname, lastname, phone, email } = useContext(UserContext);
 
+  // Ensure formData state is initialized with context values
   const [formData, setFormData] = useState({
     firstName: firstname || '',
     lastName: lastname || '',
@@ -39,7 +40,13 @@ const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artworks 
       const response = await fetch(`http://localhost:8000/api/users/${userId}/address`);
       if (response.ok) {
         const addressData = await response.json();
-        setFormData(addressData);
+        setFormData({
+          ...addressData,
+          firstName: addressData.firstName || firstname || '',
+          lastName: addressData.lastName || lastname || '',
+          phone: addressData.phone || phone || '',
+          email: addressData.email || email || ''
+        });
         setSelectedCountry(addressData.country);
       } else {
         console.error('Failed to fetch address');
@@ -56,7 +63,6 @@ const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artworks 
         throw new Error('Failed to fetch countries');
       }
       const data = await response.json();
-      console.log(data);
       setCountries(data);
     } catch (error) {
       console.error('Error fetching countries:', error);
@@ -90,7 +96,6 @@ const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artworks 
 
         const data = await response.json();
         totalShippingCost += data.shippingCost;
-        console.log(`Shipping cost for artwork ${artwork._id}: ${shippingCost}`);
       }
 
       setShippingCost(totalShippingCost);
@@ -110,6 +115,7 @@ const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artworks 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    console.log(formData);
   };
 
   return (
@@ -121,6 +127,7 @@ const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artworks 
           <select
             name="country"
             value={selectedCountry}
+            required
             onChange={handleCountryChange}
             className="w-full rounded-full border border-black p-2 px-4">
             <option value="" disabled>
@@ -138,6 +145,7 @@ const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artworks 
               type="text"
               name="firstName"
               value={formData.firstName}
+              required
               onChange={handleInputChange}
               className="w-full rounded-full border border-black p-2 px-4"
             />
@@ -148,6 +156,7 @@ const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artworks 
               type="text"
               name="lastName"
               value={formData.lastName}
+              required
               onChange={handleInputChange}
               className="w-full rounded-full border border-black p-2 px-4"
             />
@@ -159,6 +168,7 @@ const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artworks 
             type="text"
             name="address"
             value={formData.address}
+            required
             onChange={handleInputChange}
             className="w-full rounded-full border border-black p-2 px-4"
           />
@@ -182,6 +192,7 @@ const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artworks 
               type="text"
               name="city"
               value={formData.city}
+              required
               onChange={handleInputChange}
               className="w-full rounded-full border border-black p-2 px-4"
             />
@@ -192,6 +203,7 @@ const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artworks 
               type="text"
               name="postalCode"
               value={formData.postalCode}
+              required
               onChange={handleInputChange}
               className="w-full rounded-full border border-black p-2 px-4"
             />
@@ -204,6 +216,7 @@ const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artworks 
               type="text"
               name="phone"
               value={formData.phone}
+              required
               onChange={handleInputChange}
               className="w-full rounded-full border border-black p-2 px-4"
             />
@@ -216,6 +229,7 @@ const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artworks 
               value={formData.email}
               onChange={handleInputChange}
               className="w-full rounded-full border border-black p-2 px-4"
+              required
             />
           </div>
         </div>
