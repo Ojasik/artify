@@ -39,27 +39,39 @@ exports.getOrdersByUserProfile = async (req, res) => {
   try {
     const { userId } = req.user;
 
-    const orders = await Order.find({ userId }).populate('artworks');
+    const { page = 1, limit = 10 } = req.query;
+    const parsedPage = parseInt(page, 10);
+    const parsedLimit = parseInt(limit, 10);
 
-    const ordersWithBase64Images = await Promise.all(
-      orders.map(async (order) => {
-        const artworks = await Promise.all(
-          order.artworks.map(async (artworkId) => {
-            const artwork = await Artwork.findById(artworkId);
-            const base64Images = await Promise.all(
-              artwork.images.map(async (image) => ({
-                data: `data:${image.contentType};base64,${image.data.toString('base64')}`,
-                contentType: image.contentType
-              }))
-            );
-            return { ...artwork.toObject(), images: base64Images };
-          })
-        );
-        return { ...order.toObject(), artworks };
+    const skip = (parsedPage - 1) * parsedLimit;
+
+    const orders = await Order.find({ userId })
+      .populate({
+        path: 'artworks',
+        populate: {
+          path: 'images',
+          select: 'data contentType'
+        }
       })
-    );
+      .skip(skip)
+      .limit(parsedLimit)
+      .sort({ createdAt: -1 });
 
-    res.json(ordersWithBase64Images);
+    const totalOrders = await Order.countDocuments({ userId });
+
+    const ordersWithBase64Images = orders.map((order) => {
+      const artworks = order.artworks.map((artwork) => ({
+        ...artwork.toObject(),
+        images: artwork.images.map((image) => ({
+          data: `data:${image.contentType};base64,${image.data.toString('base64')}`,
+          contentType: image.contentType
+        }))
+      }));
+
+      return { ...order.toObject(), artworks };
+    });
+
+    res.status(200).json({ orders: ordersWithBase64Images, total: totalOrders });
   } catch (error) {
     console.error('Error fetching orders:', error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -210,7 +222,6 @@ exports.createConnectAccount = async (req, res) => {
   }
 };
 
-// Update order status
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -228,7 +239,12 @@ exports.updateOrderStatus = async (req, res) => {
     order.status = status;
 
     if (status === 'Cancelled') {
-      for (const artwork of order.artworks) {
+      for (const artworkId of order.artworks) {
+        const artwork = await Artwork.findById(artworkId);
+        if (!artwork) {
+          console.error(`Artwork with id ${artworkId} not found.`);
+          continue;
+        }
         artwork.status = 'Verified';
         await artwork.save();
       }

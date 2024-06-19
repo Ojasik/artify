@@ -26,14 +26,18 @@ export const Profile = () => {
   const [selectedArtworkForEdit, setSelectedArtworkForEdit] = useState(null);
   const [userArtworks, setUserArtworks] = useState([]);
   const [loadingArtworks, setLoadingArtworks] = useState(true);
+  const [loadingOrders, setLoadingOrders] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [artworksPerPage, setArtworksPerPage] = useState(4);
   const [totalArtworks, setTotalArtworks] = useState(0);
+  const [ordersPerPage, setOrdersPerPage] = useState(4); // Adjust as needed
+  const [totalOrders, setTotalOrders] = useState(0);
   const [selectedStatus, setSelectedStatus] = useState([]); // State for selected status
   const [selectedSortOrder, setSelectedSortOrder] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [priceRange, setPriceRange] = useState([0, 100000]);
   const [dateRange, setDateRange] = useState([null, null]);
+  const [currentOrdersPage, setCurrentOrdersPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [userOrders, setUserOrders] = useState([]);
 
@@ -125,23 +129,30 @@ export const Profile = () => {
   }, [profileUsername]);
 
   useEffect(() => {
-    fetchUserOrders();
-  }, []);
+    fetchUserOrders(currentOrdersPage);
+  }, [currentOrdersPage]);
 
-  const fetchUserOrders = async () => {
+  const fetchUserOrders = async (page = 1) => {
+    setLoadingOrders(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/orders/orders-profile`, {
-        credentials: 'include'
-      });
+      const response = await fetch(
+        `http://localhost:8000/api/orders/orders-profile?page=${page}&limit=${ordersPerPage}`,
+        {
+          credentials: 'include'
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
-        setUserOrders(data);
+        setUserOrders(data.orders);
+        setTotalOrders(data.total);
       } else {
         console.error('Failed to fetch user orders');
       }
     } catch (error) {
       console.error('Error fetching user orders:', error);
+    } finally {
+      setLoadingOrders(false);
     }
   };
 
@@ -229,6 +240,7 @@ export const Profile = () => {
 
   const handlePageChange = (event, page) => {
     setCurrentPage(page);
+    setCurrentOrdersPage(page);
   };
 
   const handleProfileUpdate = () => {
@@ -292,16 +304,17 @@ export const Profile = () => {
               <>
                 <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {userArtworks.map((artwork) => (
-                    <ArtworkCard
-                      key={artwork._id}
-                      artwork={artwork}
-                      handleReadMore={handleReadMore}
-                      openArtworkEditModal={openArtworkEditModal}
-                      handleDeleteArtwork={handleDeleteArtwork}
-                      showBuyButton={userProfile.username !== currentUser}
-                      showEditButton={userProfile.username === currentUser}
-                      showDeleteButton={userProfile.username === currentUser}
-                    />
+                    <div key={artwork._id}>
+                      <ArtworkCard
+                        artwork={artwork}
+                        handleReadMore={handleReadMore}
+                        openArtworkEditModal={openArtworkEditModal}
+                        handleDeleteArtwork={handleDeleteArtwork}
+                        showBuyButton={userProfile.username !== currentUser}
+                        showEditButton={userProfile.username === currentUser}
+                        showDeleteButton={userProfile.username === currentUser}
+                      />
+                    </div>
                   ))}
                 </div>
                 <Pagination
@@ -313,10 +326,20 @@ export const Profile = () => {
               </>
             )
           ) : (
-            <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {userOrders.map((order) => (
-                <OrderCard key={order._id} order={order} onUpdate={fetchUserOrders} />
-              ))}
+            <div>
+              <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {userOrders.map((order) => (
+                  <div key={order._id}>
+                    <OrderCard order={order} onUpdate={fetchUserOrders} />
+                  </div>
+                ))}
+              </div>
+              <Pagination
+                count={Math.ceil(totalOrders / ordersPerPage)}
+                page={currentOrdersPage}
+                onChange={(event, page) => setCurrentOrdersPage(page)}
+                className="mt-4"
+              />
             </div>
           )}
         </div>

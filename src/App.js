@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { MainPage } from './pages/MainPage';
 import { Login } from './components/auth/Login';
 import { Register } from './components/auth/Register';
-import { Profile } from './components/profile/Profile';
+import { Profile } from './components/Profile/Profile';
 import { UserProvider } from './contexts/UserContext';
 import { CategoryProvider } from './contexts/CategoryContext';
 import { UserRegistry } from './pages/UserRegistry';
