@@ -19,7 +19,7 @@ const app = express();
 app.use(cookieParser());
 
 const corsOptions = {
-  origin: 'https://master--artifyyy.netlify.app/',
+  origin: 'https://master--artifyyy.netlify.app',
   credentials: true
 };
 
