@@ -12,7 +12,7 @@ import { Pagination } from '@mui/material';
 import { UserContext } from '../../contexts/UserContext';
 import { ClipLoader } from 'react-spinners';
 import OrderCard from '../order/OrderCard';
-import Filter from '../filter/FIlter';
+import Filter from '../filter/Filter';
 
 export const Profile = () => {
   const [selectedPage, setSelectedPage] = useState('Artworks');
