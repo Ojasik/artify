@@ -1,0 +1,7 @@
+{
+    "name": "artify",
+    "version": "1.0.0",
+    "scripts": {
+      "heroku-postbuild": "cd backend && npm install && npm run build"
+    }
+  }
