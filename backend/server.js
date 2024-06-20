@@ -19,7 +19,7 @@ const app = express();
 app.use(cookieParser());
 
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: 'https://master--artifyyy.netlify.app/',
   credentials: true
 };
 
