@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import React, { useState, useEffect, useContext } from 'react';
 import { Modal, message, Popconfirm } from 'antd';
 import { UserContext } from '../../contexts/UserContext';
@@ -9,7 +8,6 @@ const OrderDetailModal = ({ orderDetails, visible, onClose, onUpdate }) => {
   const { role } = useContext(UserContext);
   const [paymentCompleted, setPaymentCompleted] = useState({});
 
-  // Assuming orderDetails contains information about each artwork
   useEffect(() => {
     // Initialize paymentCompleted state based on orderDetails
     const initialPaymentStatus = {};

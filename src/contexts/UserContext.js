@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 
 const UserContext = createContext();
 
@@ -57,13 +56,13 @@ const UserProvider = ({ children }) => {
   return (
     <UserContext.Provider
       value={{
-        currentUser: userData?.username,
-        role: userData?.role,
-        userId: userData?.userId,
-        firstname: userData?.firstname,
-        lastname: userData?.lastname,
-        phone: userData?.phone,
-        email: userData?.email,
+        currentUser: userData.username,
+        role: userData.role,
+        userId: userData.userId,
+        firstname: userData.firstname,
+        lastname: userData.lastname,
+        phone: userData.phone,
+        email: userData.email,
         handleLogin,
         updateCurrentUser,
         Logout
@@ -74,7 +73,3 @@ const UserProvider = ({ children }) => {
 };
 
 export { UserProvider, UserContext };
-
-UserProvider.propTypes = {
-  children: PropTypes.node.isRequired
-};

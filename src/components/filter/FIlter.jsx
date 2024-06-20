@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import React from 'react';
 import { Select, Input, DatePicker, InputNumber } from 'antd';
 import './Select.css';

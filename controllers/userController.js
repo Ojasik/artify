@@ -17,9 +17,9 @@ exports.register = async (req, res) => {
   try {
     const { username, firstname, lastname, email, phone, password } = req.body;
 
-    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    const existingUser = await User.findOne({ $or: [{ username }, { email }, { phone }] });
     if (existingUser) {
-      return res.status(400).json({ message: 'Username or email already exists' });
+      return res.status(400).json({ message: 'Username or email or phone already exists' });
     }
 
     const emailVerificationToken = jwt.sign(
@@ -44,8 +44,37 @@ exports.register = async (req, res) => {
       }
       console.log('Email sent:', info.response);
 
+      const token = jwt.sign(
+        {
+          userId: newUser._id,
+          username: newUser.username,
+          role: newUser.role,
+          firstname: newUser.firstname,
+          lastname: newUser.lastname,
+          phone: newUser.phone,
+          email: newUser.email
+        },
+        process.env.JWT,
+        { expiresIn: '1h' }
+      );
+      res.cookie('token', token, {
+        httpOnly: true,
+        maxAge: 3600000, // 1 hour expiration
+        sameSite: 'strict'
+        // secure: true,
+      });
       res.status(200).json({
-        message: 'Verification email sent. Please check your email to complete registration.'
+        message: 'Verification email sent. Please check your email to complete registration.',
+        token,
+        user: {
+          username: newUser.username,
+          role: newUser.role,
+          userId: newUser._id,
+          firstname: newUser.firstname,
+          lastname: newUser.lastname,
+          phone: newUser.phone,
+          email: newUser.email
+        }
       });
     });
   } catch (error) {
@@ -104,8 +133,8 @@ exports.verifyEmail = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { username, password } = req.body;
-    const user = await User.findOne({ username });
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ message: 'Invalid username or password' });
     }
@@ -269,6 +298,11 @@ exports.updateUser = async (req, res) => {
     user.email = email;
     user.phone = phone;
     user.role = role;
+
+    if (!user.profile) {
+      user.profile = {};
+    }
+
     user.profile.facebook = facebook;
     user.profile.instagram = instagram;
     user.profile.x = x;

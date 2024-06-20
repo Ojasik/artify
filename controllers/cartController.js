@@ -1,9 +1,6 @@
-// cartController.js
 const express = require('express');
-const router = express.Router();
 const Cart = require('../database/Cart');
 const Artwork = require('../database/Artwork');
-const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 // Get all cart items for the logged-in user

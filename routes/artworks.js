@@ -1,4 +1,3 @@
-// artworks.js
 const express = require('express');
 const router = express.Router();
 const artworkController = require('../controllers/artworkController');

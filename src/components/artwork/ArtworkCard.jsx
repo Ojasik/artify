@@ -9,8 +9,6 @@ import {
 } from '@ant-design/icons';
 import { UserContext } from '../../contexts/UserContext';
 
-import PropTypes from 'prop-types';
-
 const getStatusStyles = (status) => {
   switch (status) {
     case 'Uploaded':
@@ -42,16 +40,14 @@ export const ArtworkCard = ({
     if (!currentUser) {
       navigate('/login');
     } else {
-      addToCart(artwork._id); // Call the addToCart function with artwork ID as parameter
+      addToCart(artwork._id);
     }
   };
 
   const handleBuyNow = () => {
     if (!currentUser) {
-      // If user is not logged in, redirect to login page
       navigate('/login');
     } else {
-      // If logged in, navigate to the order page with artwork data
       navigate(`/order/${artwork._id}`, { state: { artworks: [artwork] } });
     }
   };
@@ -142,15 +138,4 @@ export const ArtworkCard = ({
       )}
     </div>
   );
-};
-
-ArtworkCard.propTypes = {
-  artwork: PropTypes.object.isRequired,
-  handleReadMore: PropTypes.func.isRequired,
-  openArtworkEditModal: PropTypes.func,
-  handleDeleteArtwork: PropTypes.func,
-  showBuyButton: PropTypes.bool,
-  showEditButton: PropTypes.bool,
-  showDeleteButton: PropTypes.bool,
-  addToCart: PropTypes.func
 };

@@ -93,8 +93,7 @@ const BankDetailsModal = ({ isOpen, onClose, onBankDetailsSubmit, onChangePasswo
           Change Password
         </button>
       ]}
-      width={800} // Increased width of the modal
-    >
+      width={800}>
       <div className="flex">
         {/* Bank Details Form */}
         <form onSubmit={formikBankDetails.handleSubmit} className="w-1/2 space-y-8 pr-4">
@@ -168,8 +167,7 @@ const BankDetailsModal = ({ isOpen, onClose, onBankDetailsSubmit, onChangePasswo
             )}
           </div>
         </form>
-        {/* Divider */}
-        <div className="mx-4 border-l border-gray-300"></div> {/* Thinner divider */}
+        <div className="mx-4 border-l border-gray-300"></div>
         {/* Password Change Form */}
         <form onSubmit={formikPassword.handleSubmit} className="w-1/2 space-y-8 pl-4">
           <div className="flex flex-col">

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { CloseOutlined } from '@ant-design/icons';
 import { Modal, Image } from 'antd';
 
@@ -253,11 +252,4 @@ export const ArtworkEditModal = ({ isOpen, onClose, artwork, updateArtworks }) =
       </div>
     </Modal>
   );
-};
-
-ArtworkEditModal.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  updateArtworks: PropTypes.func.isRequired,
-  artwork: PropTypes.object.isRequired
 };

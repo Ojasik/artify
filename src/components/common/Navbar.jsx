@@ -4,14 +4,13 @@ import logo from '../../assets/images/logo.png';
 import Logout from '../auth/Logout';
 import { UserContext } from '../../contexts/UserContext';
 import { useCategory } from '../../contexts/CategoryContext';
-import PropTypes from 'prop-types';
 import { Disclosure } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
 import { AddArtworkModal } from '../artwork/AddArtworkModal';
 import { message } from 'antd';
 import Cart from '../Cart';
 
-// Array with categories buttons (TEST)
+// Array with categories buttons
 
 const categories = [
   { name: 'All', href: '#', current: false },
@@ -108,7 +107,7 @@ export const Navbar = ({ onArtworkUpdate }) => {
                 </Disclosure.Button>
               </div>
               {/*Logo*/}
-              <div className="pl-20 sm:pl-0">
+              <div>
                 <Link to="/">
                   <div className="flex flex-shrink-0 items-center">
                     <img className="h-16 w-auto" src={logo} alt="Artify" />
@@ -117,7 +116,7 @@ export const Navbar = ({ onArtworkUpdate }) => {
                 </Link>
               </div>
 
-              {/*Another buttons(like, cart, search)*/}
+              {/*Another buttons(cart, registries)*/}
               <div>
                 <div className="flex items-center gap-4 pr-2 sm:hidden">
                   <button
@@ -268,7 +267,4 @@ export const Navbar = ({ onArtworkUpdate }) => {
       )}
     </Disclosure>
   );
-};
-Navbar.propTypes = {
-  onArtworkUpdate: PropTypes.func
 };

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 const ProfilePagesLinks = ({ profilePages, onPageChange }) => {
   return (
@@ -7,7 +6,7 @@ const ProfilePagesLinks = ({ profilePages, onPageChange }) => {
       {profilePages.map((item) => (
         <button
           key={item.name}
-          onClick={() => onPageChange(item.name)} // Add onClick event handler
+          onClick={() => onPageChange(item.name)}
           className={`${
             item.current
               ? 'bg-mainColor text-white'
@@ -18,11 +17,6 @@ const ProfilePagesLinks = ({ profilePages, onPageChange }) => {
       ))}
     </div>
   );
-};
-
-ProfilePagesLinks.propTypes = {
-  profilePages: PropTypes.array.isRequired,
-  onPageChange: PropTypes.func.isRequired // Add onPageChange prop
 };
 
 export default ProfilePagesLinks;

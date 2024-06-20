@@ -1,6 +1,4 @@
 const express = require('express');
-const router = express.Router();
-const jwt = require('jsonwebtoken');
 const Order = require('../database/Order');
 const User = require('../database/User');
 const Artwork = require('../database/Artwork');

@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect, useContext } from 'react';
-import PropTypes from 'prop-types';
 import { Modal } from 'antd';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -202,11 +201,6 @@ const AddressEditModal = ({ isOpen, onClose }) => {
       </form>
     </Modal>
   );
-};
-
-AddressEditModal.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired
 };
 
 export default AddressEditModal;

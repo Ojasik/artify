@@ -1,5 +1,3 @@
-// artworkController.js
-const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const Artwork = require('../database/Artwork');
 require('dotenv').config();

@@ -5,6 +5,7 @@ import { Logo } from '../logo';
 import { UserIcon, LockClosedIcon, EnvelopeIcon } from '@heroicons/react/24/solid';
 import { Link } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
+import { message } from 'antd';
 import EmailVerificationMessage from './EmailVerificationMessage';
 
 const validationSchema = Yup.object({
@@ -17,7 +18,7 @@ const validationSchema = Yup.object({
     .required('Last name is required'),
   phone: Yup.string()
     .matches(/^\+?[0-9]+$/, 'Phone number must start with + and contain only digits')
-    .min(8, 'Phone number must be at least 10 digits')
+    .min(8, 'Phone number must be at least 8 digits')
     .max(15, 'Phone number must not exceed 15 digits')
     .required('Phone is required'),
   email: Yup.string()
@@ -65,11 +66,11 @@ export const Register = () => {
         const data = await response.json();
 
         if (response.ok) {
-          console.log(data.message); // Registration successful
+          console.log(data.message);
           document.cookie = `token=${data.token}; path=/; max-age=3600; SameSite=Lax`;
           updateCurrentUser(data.user);
         } else {
-          console.error(data.message); // Registration failed (error)
+          message.error(data.message);
         }
       } catch (error) {
         console.error('Error during registration:', error);

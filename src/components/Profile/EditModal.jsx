@@ -1,5 +1,4 @@
-import React, { useRef, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import React, { useRef } from 'react';
 import { CloseOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 import { useFormik } from 'formik';
@@ -272,20 +271,4 @@ export const EditModal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
       </form>
     </Modal>
   );
-};
-
-EditModal.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onProfileUpdate: PropTypes.func.isRequired,
-  initialProfileData: PropTypes.shape({
-    firstname: PropTypes.string,
-    lastname: PropTypes.string,
-    description: PropTypes.string,
-    website: PropTypes.string,
-    x: PropTypes.string,
-    instagram: PropTypes.string,
-    facebook: PropTypes.string,
-    avatar: PropTypes.string
-  })
 };

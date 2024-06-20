@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import OrderDetailModal from './OrderDetailModal';
 
 const truncateID = (id, maxLength) => {
@@ -69,11 +68,6 @@ const OrderCard = ({ order, onUpdate }) => {
       />
     </div>
   );
-};
-
-OrderCard.propTypes = {
-  order: PropTypes.object.isRequired,
-  onUpdate: PropTypes.func.isRequired
 };
 
 export default OrderCard;

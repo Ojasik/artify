@@ -1,26 +1,3 @@
-// const cron = require('node-cron');
-// const Cart = require('./database/Cart');
-
-// // Define the cron job function
-// const removeOutdatedCartItems = async () => {
-//   try {
-//     // Calculate the timestamp 30 minutes ago
-//     const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
-
-//     // Remove outdated cart items
-//     await Cart.deleteMany({ addedAt: { $lt: thirtyMinutesAgo } });
-//     console.log('Outdated cart items removed successfully');
-//   } catch (error) {
-//     console.error('Error removing outdated cart items:', error);
-//   }
-// };
-
-// // Define the cron schedule
-// cron.schedule('* * * * *', removeOutdatedCartItems);
-
-// // Export the cron job function
-// module.exports = removeOutdatedCartItems;
-
 const cron = require('node-cron');
 const Cart = require('./database/Cart');
 const Artwork = require('./database/Artwork');

@@ -107,7 +107,6 @@ export const UserRegistry = () => {
         </div>
       )
     },
-
     {
       headerName: 'Social Media',
       field: 'profile',
@@ -118,16 +117,20 @@ export const UserRegistry = () => {
         return (
           <div className="flex h-full items-center justify-center gap-8 text-xl">
             {profile.instagram && (
-              <InstagramOutlined
-                href={profile.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-              />
+              <a href={`http://${profile.instagram}`} target="_blank" rel="noopener noreferrer">
+                <InstagramOutlined />
+              </a>
             )}
             {profile.facebook && (
-              <FacebookOutlined href={profile.facebook} target="_blank" rel="noopener noreferrer" />
+              <a href={`http://${profile.facebook}`} target="_blank" rel="noopener noreferrer">
+                <FacebookOutlined />
+              </a>
             )}
-            {profile.x && <XOutlined href={profile.x} target="_blank" rel="noopener noreferrer" />}
+            {profile.x && (
+              <a href={`http://${profile.x}`} target="_blank" rel="noopener noreferrer">
+                <XOutlined />
+              </a>
+            )}
           </div>
         );
       }
@@ -215,7 +218,7 @@ export const UserRegistry = () => {
       });
 
       if (response.ok) {
-        console.log('User deleted successfully');
+        message.success(`User deleted successfully`);
         fetchUsers();
       } else {
         console.error('Failed to delete user');
@@ -242,14 +245,15 @@ export const UserRegistry = () => {
       });
 
       if (response.ok) {
-        console.log(`User ${status === 'disable' ? 'disabled' : 'enabled'} successfully`);
+        message.success(`User ${status === 'disable' ? 'deactivated' : 'activated'} successfully`);
         fetchUsers();
       } else {
-        console.error(`Failed to ${status === 'disable' ? 'disable' : 'enable'} user`);
-        console.log(username);
+        message.error(`Failed to ${status === 'disable' ? 'deactivate' : 'activate'} user`);
+        console.error(`Failed to ${status === 'disable' ? 'deactivate' : 'activate'} user`);
       }
     } catch (error) {
-      console.error(`Error ${status === 'disable' ? 'disabling' : 'enabling'} user:`, error);
+      message.error(`Error ${status === 'disable' ? 'deactivating' : 'activating'} user`);
+      console.error(`Error ${status === 'disable' ? 'deactivating' : 'activating'} user:`, error);
     }
   };
 

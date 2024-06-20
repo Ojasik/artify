@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Navbar } from '../components/common/Navbar';
+import { UserContext } from '../contexts/UserContext';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
@@ -8,6 +9,7 @@ import OrderDetailModal from '../components/order/OrderDetailModal';
 
 export const OrderRegistry = () => {
   const [orders, setOrders] = useState([]);
+  const { role } = useContext(UserContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
@@ -49,6 +51,15 @@ export const OrderRegistry = () => {
         return '';
     }
   };
+
+  if (!role || (role !== 'Moderator' && role !== 'Admin')) {
+    return (
+      <div>
+        <h1>Access Denied</h1>
+        <p>You do not have permission to access this page.</p>
+      </div>
+    );
+  }
 
   const columnDefs = [
     { headerName: 'Order ID', field: '_id', sortable: true, filter: true, flex: 1 },

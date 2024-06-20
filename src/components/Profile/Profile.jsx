@@ -12,7 +12,7 @@ import { Pagination } from '@mui/material';
 import { UserContext } from '../../contexts/UserContext';
 import { ClipLoader } from 'react-spinners';
 import OrderCard from '../order/OrderCard';
-import Filter from '../filter/FIlter';
+import Filter from '../filter/Filter';
 
 export const Profile = () => {
   const [selectedPage, setSelectedPage] = useState('Artworks');
@@ -30,9 +30,9 @@ export const Profile = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [artworksPerPage, setArtworksPerPage] = useState(4);
   const [totalArtworks, setTotalArtworks] = useState(0);
-  const [ordersPerPage, setOrdersPerPage] = useState(4); // Adjust as needed
+  const [ordersPerPage, setOrdersPerPage] = useState(4);
   const [totalOrders, setTotalOrders] = useState(0);
-  const [selectedStatus, setSelectedStatus] = useState([]); // State for selected status
+  const [selectedStatus, setSelectedStatus] = useState([]);
   const [selectedSortOrder, setSelectedSortOrder] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [priceRange, setPriceRange] = useState([0, 100000]);
@@ -90,8 +90,10 @@ export const Profile = () => {
     const handleResize = () => {
       if (window.innerWidth >= 1280) {
         setArtworksPerPage(4); // Desktop view
+        setOrdersPerPage(4);
       } else {
-        setArtworksPerPage(3); // Mobile view
+        setArtworksPerPage(3);
+        setOrdersPerPage(3); // Mobile view
       }
     };
 
@@ -326,21 +328,31 @@ export const Profile = () => {
               </>
             )
           ) : (
-            <div>
-              <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {userOrders.map((order) => (
-                  <div key={order._id}>
-                    <OrderCard order={order} onUpdate={fetchUserOrders} />
+            <>
+              {loadingOrders ? (
+                <div className="flex h-full w-full items-center justify-center">
+                  <ClipLoader size={50} color={'#7734e7'} loading={loadingOrders} />
+                </div>
+              ) : userOrders.length === 0 ? (
+                <div className="my-4 text-center">No orders to display</div>
+              ) : (
+                <>
+                  <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {userOrders.map((order) => (
+                      <div key={order._id}>
+                        <OrderCard order={order} onUpdate={fetchUserOrders} />
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <Pagination
-                count={Math.ceil(totalOrders / ordersPerPage)}
-                page={currentOrdersPage}
-                onChange={(event, page) => setCurrentOrdersPage(page)}
-                className="mt-4"
-              />
-            </div>
+                  <Pagination
+                    count={Math.ceil(totalOrders / ordersPerPage)}
+                    page={currentOrdersPage}
+                    onChange={(event, page) => setCurrentOrdersPage(page)}
+                    className="mt-4"
+                  />
+                </>
+              )}
+            </>
           )}
         </div>
       </div>

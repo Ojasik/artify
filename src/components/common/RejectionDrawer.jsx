@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { Drawer, Input } from 'antd';
 
 const RejectionDrawer = ({ visible, onClose, artworkDetails, onUpdate, setArtworkDetails }) => {
@@ -54,14 +53,6 @@ const RejectionDrawer = ({ visible, onClose, artworkDetails, onUpdate, setArtwor
       </button>
     </Drawer>
   );
-};
-
-RejectionDrawer.propTypes = {
-  visible: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  artworkDetails: PropTypes.object.isRequired,
-  onUpdate: PropTypes.func,
-  setArtworkDetails: PropTypes.func
 };
 
 export default RejectionDrawer;

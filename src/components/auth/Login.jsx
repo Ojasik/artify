@@ -5,9 +5,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { UserContext } from '../../contexts/UserContext';
+import { message } from 'antd';
 
 const LoginSchema = Yup.object().shape({
-  username: Yup.string().required('Username is required'),
+  email: Yup.string().email('Invalid email format').required('Email is required'),
   password: Yup.string().required('Password is required')
 });
 export const Login = () => {
@@ -16,7 +17,7 @@ export const Login = () => {
 
   const formik = useFormik({
     initialValues: {
-      username: '',
+      email: '',
       password: ''
     },
     validationSchema: LoginSchema,
@@ -38,7 +39,7 @@ export const Login = () => {
           handleLogin();
           navigate('/');
         } else {
-          console.error(data.message);
+          message.error(data.message);
         }
       } catch (error) {
         console.error('Error during login:', error);
@@ -57,24 +58,22 @@ export const Login = () => {
             <div className="relative">
               <UserIcon
                 className={`absolute right-4 top-1/4 h-5 ${
-                  formik.touched.password && formik.errors.password ? 'top-2.5' : 'top-1/4'
+                  formik.touched.email && formik.errors.email ? 'top-2.5' : 'top-1/4'
                 }`}
               />
               <input
                 type="text"
                 className={`w-80 rounded-full border p-2 px-4 ${
-                  formik.touched.username && formik.errors.username
-                    ? 'border-red-500'
-                    : 'border-black'
+                  formik.touched.email && formik.errors.email ? 'border-red-500' : 'border-black'
                 }`}
-                placeholder="Username"
-                name="username"
-                value={formik.values.username}
+                placeholder="Email"
+                name="email"
+                value={formik.values.email}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
               />
-              {formik.touched.username && formik.errors.username && (
-                <div className="text-red-500">{formik.errors.username}</div>
+              {formik.touched.email && formik.errors.email && (
+                <div className="text-red-500">{formik.errors.email}</div>
               )}
             </div>
             <div className="relative">

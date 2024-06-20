@@ -6,7 +6,6 @@ import { faXTwitter, faInstagram, faFacebookF } from '@fortawesome/free-brands-s
 import { GlobeAltIcon } from '@heroicons/react/24/outline';
 import { UserContext } from '../../contexts/UserContext';
 import AddressEditModal from './AddressEditModal';
-import PropTypes from 'prop-types';
 import BankDetailsModal from './BankDetailsModal';
 
 import Avatar from '../common/Avatar';
@@ -38,32 +37,31 @@ export const UserCard = ({ userProfile, openEditModal }) => {
       if (response.ok) {
         console.log('Password changed successfully');
         setIsBankModalOpen(false);
-        message.success('Password changed successfully'); // Show success message
+        message.success('Password changed successfully');
       } else if (response.status === 400) {
         const data = await response.json();
-        message.error(data.message); // Show error message if old password is incorrect
+        message.error(data.message);
       } else {
         console.error('Failed to change password:', response.statusText);
-        message.error('Failed to change password'); // Show generic error message
+        message.error('Failed to change password');
       }
     } catch (error) {
       console.error('Error changing password:', error);
-      message.error('Error changing password'); // Show error message for unexpected errors
+      message.error('Error changing password');
     }
   };
 
-  // Really this data are not used, in backend there are data for testing provided by Stripe
   const handleBankDetailsSubmit = async (bankDetails) => {
     try {
       console.log(bankDetails);
-      // Send a POST request to your backend API to save the bank details
+
       const response = await fetch('http://localhost:8000/api/orders/create-connect-account', {
         method: 'POST',
         credentials: 'include',
         headers: {
-          'Content-Type': 'application/json' // Set Content-Type header
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(bankDetails) // Send the bank details in the request body
+        body: JSON.stringify(bankDetails)
       });
 
       if (response.ok) {
@@ -142,9 +140,4 @@ export const UserCard = ({ userProfile, openEditModal }) => {
       />
     </div>
   );
-};
-
-UserCard.propTypes = {
-  userProfile: PropTypes.object.isRequired,
-  openEditModal: PropTypes.func.isRequired
 };

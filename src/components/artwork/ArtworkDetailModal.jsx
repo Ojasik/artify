@@ -1,5 +1,4 @@
 import React, { useContext, useState } from 'react';
-import PropTypes from 'prop-types';
 import { Modal, Image } from 'antd';
 import { UserContext } from '../../contexts/UserContext';
 import RejectionDrawer from '../common/RejectionDrawer';
@@ -220,12 +219,4 @@ export const ArtworkDetailModal = ({
       />
     </>
   );
-};
-
-ArtworkDetailModal.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  artworkDetails: PropTypes.object.isRequired,
-  setArtworkDetails: PropTypes.func,
-  onUpdate: PropTypes.func
 };

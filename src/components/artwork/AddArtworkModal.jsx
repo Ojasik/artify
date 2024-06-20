@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { CloseOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { Modal, Image, Popover, message } from 'antd';
 import { useFormik } from 'formik';
@@ -372,10 +371,4 @@ export const AddArtworkModal = ({ isOpen, onClose, onArtworkUpdate }) => {
       </form>
     </Modal>
   );
-};
-
-AddArtworkModal.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  onArtworkUpdate: PropTypes.func,
-  onClose: PropTypes.func.isRequired
 };

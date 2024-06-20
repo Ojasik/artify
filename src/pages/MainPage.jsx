@@ -18,10 +18,9 @@ export const MainPage = () => {
   const { selectedCategory, setSelectedCategory } = useCategory();
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [initialLoad, setInitialLoad] = useState(true);
-  const [minPrice, setMinPrice] = useState(0); // Default minPrice is 0
-  const [maxPrice, setMaxPrice] = useState(100000); // Default maxPrice is 100000
-  const [sortOrder, setSortOrder] = useState(); // Default sorting order
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(100000);
+  const [sortOrder, setSortOrder] = useState();
 
   const location = useLocation();
 
@@ -75,7 +74,6 @@ export const MainPage = () => {
 
       if (response.ok) {
         const artworksData = await response.json();
-        console.log(`Fetched Artworks Data:`, artworksData); // Debugging log
         const verifiedArtworks = artworksData.filter((artwork) => artwork.status === 'Verified');
 
         // If it's the first page, reset artworks state
@@ -105,10 +103,6 @@ export const MainPage = () => {
   useEffect(() => {
     fetchArtworks(page, minPrice, maxPrice, sortOrder);
   }, [page, minPrice, maxPrice, sortOrder]);
-
-  useEffect(() => {
-    console.log(`Artworks State:`, artworks); // Debugging log
-  }, [artworks]);
 
   const handleReadMore = (artworkDetails) => {
     setSelectedArtworkDetails(artworkDetails);
@@ -168,8 +162,8 @@ export const MainPage = () => {
       <Navbar onArtworkUpdate={handleArtworkUpdate} />
 
       <div className="m-auto max-w-screen-2xl">
-        <div className="flex space-x-4 pl-8 pt-6">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-4 pl-8 pt-6">
+          <div className="mb-4 flex items-center gap-2 sm:mb-0">
             <InputNumber
               placeholder="Min Price"
               addonAfter="€"
@@ -177,7 +171,7 @@ export const MainPage = () => {
               max={100000}
               value={minPrice}
               onChange={(value) => setMinPrice(value)}
-              className="w-32"
+              className="w-full sm:w-32"
             />
             <div className="w-4 border-b border-gray-300"></div>
             <InputNumber
@@ -187,21 +181,21 @@ export const MainPage = () => {
               max={100000}
               value={maxPrice}
               onChange={(value) => setMaxPrice(value)}
-              className="w-32"
+              className="w-full sm:w-32"
             />
           </div>
           <Select
             value={sortOrder}
             placeholder="Sort by price"
             onChange={(value) => setSortOrder(value)}
-            className="">
+            className="mb-4 w-full sm:mb-0 sm:w-32">
             <Option value="asc">Asc</Option>
             <Option value="desc">Desc</Option>
           </Select>
           <Button
             type="danger"
             onClick={clearFilters}
-            className="rounded-md bg-red-500 px-8 py-1 text-white">
+            className="rounded-md bg-red-500 px-4 py-1 text-white sm:px-8">
             Clear Filters
           </Button>
         </div>
@@ -209,7 +203,7 @@ export const MainPage = () => {
         <InfiniteScroll
           dataLength={filteredArtworks.length}
           next={() => setPage((prevPage) => prevPage + 1)}
-          hasMore={hasMore && !noArtworksToDisplay} // Adjusted hasMore based on noArtworksToDisplay
+          hasMore={hasMore && !noArtworksToDisplay}
           loader={<h4 className="pl-8">Loading...</h4>}
           endMessage={
             noArtworksToDisplay ? (
