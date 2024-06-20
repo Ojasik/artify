@@ -25,7 +25,7 @@ export const UserCard = ({ userProfile, openEditModal }) => {
   const handlePasswordChangeSubmit = async (passwordDetails) => {
     try {
       console.log(passwordDetails);
-      const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/users/change-password', {
+      const response = await fetch('http://localhost:8000/api/users/change-password', {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -55,7 +55,7 @@ export const UserCard = ({ userProfile, openEditModal }) => {
     try {
       console.log(bankDetails);
 
-      const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/orders/create-connect-account', {
+      const response = await fetch('http://localhost:8000/api/orders/create-connect-account', {
         method: 'POST',
         credentials: 'include',
         headers: {

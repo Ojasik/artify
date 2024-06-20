@@ -7,7 +7,7 @@ const RejectionDrawer = ({ visible, onClose, artworkDetails, onUpdate, setArtwor
   const handleRejection = async () => {
     try {
       const response = await fetch(
-        `https://artify-backend-0eef31091a04.herokuapp.com/api/artworks/${artworkDetails._id}/reject`,
+        `http://localhost:8000/api/artworks/${artworkDetails._id}/reject`,
         {
           method: 'PUT',
           headers: {

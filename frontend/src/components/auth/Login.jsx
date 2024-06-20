@@ -23,7 +23,7 @@ export const Login = () => {
     validationSchema: LoginSchema,
     onSubmit: async (values) => {
       try {
-        const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/users/login', {
+        const response = await fetch('http://localhost:8000/api/users/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

@@ -36,7 +36,7 @@ export const MainPage = () => {
 
   const addToCart = async (artworkId) => {
     try {
-      const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/cart/add', {
+      const response = await fetch('http://localhost:8000/api/cart/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -58,7 +58,7 @@ export const MainPage = () => {
 
   const fetchArtworks = async (page, minPrice, maxPrice, sortOrder, limit = 10) => {
     try {
-      let url = `https://artify-backend-0eef31091a04.herokuapp.com/api/artworks?page=${page}&limit=${limit}`;
+      let url = `http://localhost:8000/api/artworks?page=${page}&limit=${limit}`;
 
       if (minPrice !== 0) {
         url += `&minPrice=${minPrice}`;

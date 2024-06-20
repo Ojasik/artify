@@ -54,7 +54,7 @@ export const Register = () => {
       try {
         setIsSubmitting(true);
         setShowEmailVerification(true);
-        const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/users/register', {
+        const response = await fetch('http://localhost:8000/api/users/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

@@ -54,7 +54,7 @@ export const ArtworkDetailModal = ({
   const handleVerify = async () => {
     try {
       const response = await fetch(
-        `https://artify-backend-0eef31091a04.herokuapp.com/api/artworks/${artworkDetails._id}/verify`,
+        `http://localhost:8000/api/artworks/${artworkDetails._id}/verify`,
         {
           method: 'PUT',
           headers: {

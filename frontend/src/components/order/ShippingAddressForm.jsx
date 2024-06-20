@@ -36,7 +36,7 @@ const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artworks 
 
   const fetchAddress = async () => {
     try {
-      const response = await fetch(`https://artify-backend-0eef31091a04.herokuapp.com/api/users/${userId}/address`);
+      const response = await fetch(`http://localhost:8000/api/users/${userId}/address`);
       if (response.ok) {
         const addressData = await response.json();
         setFormData({
@@ -57,7 +57,7 @@ const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artworks 
 
   const fetchCountries = async () => {
     try {
-      const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/shippingrates');
+      const response = await fetch('http://localhost:8000/api/shippingrates');
       if (!response.ok) {
         throw new Error('Failed to fetch countries');
       }
@@ -75,7 +75,7 @@ const ShippingAddressForm = ({ onShippingCostChange, onFormDataChange, artworks 
       let totalShippingCost = 0;
 
       for (const artwork of artworks) {
-        const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/shippingrates/calculate-shipping', {
+        const response = await fetch('http://localhost:8000/api/shippingrates/calculate-shipping', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

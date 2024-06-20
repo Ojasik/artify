@@ -111,7 +111,7 @@ export const Profile = () => {
 
   const fetchProfileData = async () => {
     try {
-      const response = await fetch(`https://artify-backend-0eef31091a04.herokuapp.com/api/users/profile/${profileUsername}`, {
+      const response = await fetch(`http://localhost:8000/api/users/profile/${profileUsername}`, {
         credentials: 'include'
       });
 
@@ -138,7 +138,7 @@ export const Profile = () => {
     setLoadingOrders(true);
     try {
       const response = await fetch(
-        `https://artify-backend-0eef31091a04.herokuapp.com/api/orders/orders-profile?page=${page}&limit=${ordersPerPage}`,
+        `http://localhost:8000/api/orders/orders-profile?page=${page}&limit=${ordersPerPage}`,
         {
           credentials: 'include'
         }
@@ -162,7 +162,7 @@ export const Profile = () => {
     setLoadingArtworks(true);
     try {
       if (userProfile.username) {
-        let apiUrl = `https://artify-backend-0eef31091a04.herokuapp.com/api/artworks/user/${userProfile.username}?page=${page}&limit=${artworksPerPage}`;
+        let apiUrl = `http://localhost:8000/api/artworks/user/${userProfile.username}?page=${page}&limit=${artworksPerPage}`;
 
         if (userProfile.username !== currentUser) {
           // If the user is not the owner, only fetch artworks with status "Verified"
@@ -222,7 +222,7 @@ export const Profile = () => {
 
   const handleDeleteArtwork = async (artworkId) => {
     try {
-      const response = await fetch(`https://artify-backend-0eef31091a04.herokuapp.com/api/artworks/${artworkId}`, {
+      const response = await fetch(`http://localhost:8000/api/artworks/${artworkId}`, {
         method: 'DELETE',
         credentials: 'include'
       });

@@ -86,7 +86,7 @@ export const AddArtworkModal = ({ isOpen, onClose, onArtworkUpdate }) => {
           formDataToSend.append('images', image.file);
         });
 
-        const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/artworks/add-artwork', {
+        const response = await fetch('http://localhost:8000/api/artworks/add-artwork', {
           method: 'POST',
           body: formDataToSend,
           credentials: 'include'

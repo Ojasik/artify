@@ -87,7 +87,7 @@ export const ArtworkEditModal = ({ isOpen, onClose, artwork, updateArtworks }) =
       newImages.forEach((image, index) => {
         formDataWithImages.append(`images`, image);
       });
-      const response = await fetch(`https://artify-backend-0eef31091a04.herokuapp.com/api/artworks/${artwork._id}`, {
+      const response = await fetch(`http://localhost:8000/api/artworks/${artwork._id}`, {
         method: 'PUT',
         credentials: 'include',
         body: formDataWithImages

@@ -15,7 +15,7 @@ const UserProvider = ({ children }) => {
 
   const fetchCurrentUser = async () => {
     try {
-      const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/users/get-username', {
+      const response = await fetch('http://localhost:8000/api/users/get-username', {
         credentials: 'include'
       });
       if (response.ok) {

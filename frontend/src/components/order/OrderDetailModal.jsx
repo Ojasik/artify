@@ -85,7 +85,7 @@ const OrderDetailModal = ({ orderDetails, visible, onClose, onUpdate }) => {
 
   const handleSendMoney = async (artwork) => {
     try {
-      const response = await fetch(`https://artify-backend-0eef31091a04.herokuapp.com/api/orders/send-money/${artwork._id}`, {
+      const response = await fetch(`http://localhost:8000/api/orders/send-money/${artwork._id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -116,7 +116,7 @@ const OrderDetailModal = ({ orderDetails, visible, onClose, onUpdate }) => {
   const handleCancelOrder = async () => {
     try {
       const response = await fetch(
-        `https://artify-backend-0eef31091a04.herokuapp.com/api/orders/update-order-status/${orderId}`,
+        `http://localhost:8000/api/orders/update-order-status/${orderId}`,
         {
           method: 'PUT',
           headers: {
@@ -143,7 +143,7 @@ const OrderDetailModal = ({ orderDetails, visible, onClose, onUpdate }) => {
   const handleSubmit = async () => {
     try {
       const response = await fetch(
-        `https://artify-backend-0eef31091a04.herokuapp.com/api/orders/update-order-status/${orderId}`,
+        `http://localhost:8000/api/orders/update-order-status/${orderId}`,
         {
           method: 'PUT',
           headers: {

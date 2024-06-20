@@ -19,7 +19,7 @@ const app = express();
 app.use(cookieParser());
 
 const corsOptions = {
-  origin: 'https://master--artifyyy.netlify.app',
+  origin: 'http://localhost:3000',
   credentials: true
 };
 
@@ -37,6 +37,6 @@ app.use('/api/orders', ordersRoute);
 
 cron();
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server is running on port ${process.env.PORT}`);
+app.listen(process.env.PORTD, () => {
+  console.log(`Server is running on port ${process.env.PORTD}`);
 });

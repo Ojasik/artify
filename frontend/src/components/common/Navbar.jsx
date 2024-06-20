@@ -37,7 +37,7 @@ export const Navbar = ({ onArtworkUpdate }) => {
 
   const fetchStripeAccountId = async () => {
     try {
-      const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/users/get-stripe-account-id', {
+      const response = await fetch('http://localhost:8000/api/users/get-stripe-account-id', {
         credentials: 'include'
       });
       if (response.ok) {

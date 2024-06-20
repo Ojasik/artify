@@ -31,7 +31,7 @@ export const UserRegistry = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/users', {
+      const response = await fetch('http://localhost:8000/api/users', {
         credentials: 'include'
       });
 
@@ -212,7 +212,7 @@ export const UserRegistry = () => {
 
   const handleDeleteUser = async (username) => {
     try {
-      const response = await fetch(`https://artify-backend-0eef31091a04.herokuapp.com/api/users/${username}`, {
+      const response = await fetch(`http://localhost:8000/api/users/${username}`, {
         method: 'DELETE',
         credentials: 'include'
       });
@@ -239,7 +239,7 @@ export const UserRegistry = () => {
 
   const handleUserStatusChange = async (username, status) => {
     try {
-      const response = await fetch(`https://artify-backend-0eef31091a04.herokuapp.com/api/users/${username}/${status}`, {
+      const response = await fetch(`http://localhost:8000/api/users/${username}/${status}`, {
         method: 'PUT',
         credentials: 'include'
       });
