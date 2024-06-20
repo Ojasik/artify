@@ -30,9 +30,10 @@
       "uuid": "^9.0.1"
     },
     "scripts": {
-      "start": "node server.js",
-      "devStart": "nodemon server.js",
-      "heroku-postbuild": "npm install && npm start"
-    }
+    "start": "node server.js",
+    "devStart": "nodemon server.js",
+    "heroku-postbuild": "npm install && npm run build",
+    "build": "echo 'Add your build script here if needed'"
+  }
   }
   
