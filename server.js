@@ -37,6 +37,6 @@ app.use('/api/orders', ordersRoute);
 
 cron();
 
-app.listen(process.env.PORTD, () => {
-  console.log(`Server is running on port ${process.env.PORTD}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Server is running on port ${process.env.PORT}`);
 });
