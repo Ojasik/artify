@@ -30,7 +30,7 @@ const AddressEditModal = ({ isOpen, onClose }) => {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const response = await fetch('http://localhost:8000/api/users/add-address', {
+        const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/users/add-address', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -54,7 +54,7 @@ const AddressEditModal = ({ isOpen, onClose }) => {
 
   const fetchCountries = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/shippingrates');
+      const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/shippingrates');
       if (response.ok) {
         const shippingRates = await response.json();
         const uniqueCountries = [...new Set(shippingRates.map((rate) => rate.country))];

@@ -38,7 +38,7 @@ export const EditModal = ({ isOpen, onClose, onProfileUpdate, initialProfileData
     validationSchema,
     onSubmit: async (values) => {
       try {
-        const response = await fetch('http://localhost:8000/api/users/profile', {
+        const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/users/profile', {
           method: 'PUT',
           credentials: 'include',
           headers: {

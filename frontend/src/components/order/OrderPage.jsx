@@ -76,7 +76,7 @@ const OrderPage = () => {
           (artworks.reduce((total, artwork) => total + artwork.price, 0) + shippingCost) * 100
         );
 
-        const response = await fetch('http://localhost:8000/api/orders/create-payment-intent', {
+        const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/orders/create-payment-intent', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -135,7 +135,7 @@ const OrderPage = () => {
         email: formData.email
       };
 
-      const response = await fetch('http://localhost:8000/api/orders/create-order', {
+      const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/orders/create-order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

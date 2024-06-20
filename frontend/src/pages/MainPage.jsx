@@ -36,7 +36,7 @@ export const MainPage = () => {
 
   const addToCart = async (artworkId) => {
     try {
-      const response = await fetch('http://localhost:8000/api/cart/add', {
+      const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/cart/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

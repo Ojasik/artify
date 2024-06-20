@@ -16,7 +16,7 @@ export const ArtworkRegistry = () => {
 
   const fetchArtworks = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/artworks/registry', {
+      const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/artworks/registry', {
         credentials: 'include'
       });
 

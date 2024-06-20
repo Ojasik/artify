@@ -14,7 +14,7 @@ const Cart = ({ isOpen, onCancel }) => {
 
   const fetchCartItems = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/cart', {
+      const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/cart', {
         credentials: 'include'
       });
 
@@ -31,7 +31,7 @@ const Cart = ({ isOpen, onCancel }) => {
 
   const handleDeleteArtwork = async (itemId) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/cart/${itemId}`, {
+      const response = await fetch(`https://artify-backend-0eef31091a04.herokuapp.com/api/cart/${itemId}`, {
         method: 'DELETE',
         credentials: 'include'
       });

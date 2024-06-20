@@ -9,7 +9,7 @@ const Logout = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/users/logout', {
+      const response = await fetch('https://artify-backend-0eef31091a04.herokuapp.com/api/users/logout', {
         method: 'POST',
         credentials: 'include'
       });
