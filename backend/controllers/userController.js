@@ -28,7 +28,7 @@ exports.register = async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    const verificationLink = `http://localhost:8000/api/users/verify-email?token=${emailVerificationToken}&fromEmail=true`;
+    const verificationLink = `https://artify-backend-0eef31091a04.herokuapp.com/api/users/verify-email?token=${emailVerificationToken}&fromEmail=true`;
 
     const mailOptions = {
       from: 'meshkis.mark@gmail.com',
@@ -124,7 +124,7 @@ exports.verifyEmail = async (req, res) => {
       sameSite: 'strict'
     });
 
-    res.redirect('http://localhost:3000/');
+    res.redirect('https://master--artifyyy.netlify.app/');
   } catch (error) {
     console.error('Error verifying email:', error);
     res.status(400).json({ message: 'Invalid or expired token' });
