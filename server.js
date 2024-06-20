@@ -19,7 +19,7 @@ const app = express();
 app.use(cookieParser());
 
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: 'https://elaborate-cassata-915979.netlify.app/',
   credentials: true
 };
 
@@ -35,8 +35,16 @@ app.use('/api/cart', cartRoute);
 app.use('/api/shippingrates', shippingRateRoute);
 app.use('/api/orders', ordersRoute);
 
+app.use(express.static(path.join(__dirname, 'build')));
+
+// The "catchall" handler: for any request that doesn't match one above, send back React's index.html file.
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
 cron();
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server is running on port ${process.env.PORT}`);
+const port = process.env.PORT || 8000; // Use the environment port or default to 8000
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
