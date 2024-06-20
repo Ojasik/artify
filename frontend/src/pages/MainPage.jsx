@@ -58,7 +58,7 @@ export const MainPage = () => {
 
   const fetchArtworks = async (page, minPrice, maxPrice, sortOrder, limit = 10) => {
     try {
-      let url = `http://localhost:8000/api/artworks?page=${page}&limit=${limit}`;
+      let url = `https://artify-backend-0eef31091a04.herokuapp.com/api/artworks?page=${page}&limit=${limit}`;
 
       if (minPrice !== 0) {
         url += `&minPrice=${minPrice}`;
