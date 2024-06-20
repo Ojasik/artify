@@ -32,7 +32,7 @@
     "scripts": {
       "start": "node server.js",
       "devStart": "nodemon server.js",
-      "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run build"
+      "heroku-postbuild": "npm install && npm run build"
     }
   }
   
